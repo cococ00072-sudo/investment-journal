@@ -1,0 +1,2496 @@
+<!DOCTYPE html>
+<!-- saved from url=(0098)https://cococ00072-sudo.github.io/investment-journal/%ED%88%AC%EC%9E%90_%EC%9D%BC%EC%A7%80_v9.html -->
+<html lang="ko"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>투자 일지</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f7f5;
+    --surface: #ffffff;
+    --surface2: #f2f2f0;
+    --border: #e4e4e0;
+    --border2: #d0d0cb;
+    --text: #1a1a18;
+    --text2: #5a5a55;
+    --text3: #9a9a94;
+    --accent: #1a1a18;
+    --green: #2d7a4f;
+    --green-bg: #eaf4ee;
+    --red: #c0392b;
+    --red-bg: #fdf0ee;
+    --blue: #1d5fa8;
+    --blue-bg: #eaf1fb;
+    --amber: #a06000;
+    --amber-bg: #fdf4e3;
+    --purple: #5a3fb5;
+    --purple-bg: #f0edfb;
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+
+  body {
+    font-family: -apple-system, 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Layout ── */
+  .app { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    overflow-y: auto;
+    z-index: 10;
+  }
+
+  .main {
+    margin-left: 220px;
+    flex: 1;
+    padding: 32px 40px;
+    max-width: 900px;
+  }
+
+  /* ── Sidebar ── */
+  .logo {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .logo-title { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+  .logo-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  .sidebar-nav { padding: 0 8px; }
+  .nav-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+    color: var(--text3); padding: 12px 12px 6px; text-transform: uppercase;
+  }
+  .nav-btn {
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; padding: 8px 12px; border: none; background: none;
+    color: var(--text2); font-size: 13px; border-radius: var(--radius);
+    cursor: pointer; text-align: left; transition: background 0.1s;
+  }
+  .nav-btn:hover { background: var(--surface2); color: var(--text); }
+  .nav-btn.active { background: var(--text); color: #fff; }
+  .nav-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+  .date-picker-wrap {
+    padding: 16px 20px 0;
+    border-top: 1px solid var(--border);
+    margin-top: 12px;
+  }
+  .date-picker-wrap label { font-size: 10px; color: var(--text3); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; display: block; margin-bottom: 6px; }
+  .date-picker-wrap input[type=date] {
+    width: 100%; padding: 7px 10px; border: 1px solid var(--border2);
+    border-radius: var(--radius); font-size: 13px; color: var(--text);
+    background: var(--surface2); outline: none; cursor: pointer;
+  }
+  .date-picker-wrap input[type=date]:focus { border-color: var(--text); }
+
+  .save-btn {
+    margin: 12px 20px 0; width: calc(100% - 40px);
+    padding: 9px; background: var(--text); color: #fff;
+    border: none; border-radius: var(--radius); font-size: 13px;
+    font-weight: 500; cursor: pointer; transition: opacity 0.15s;
+  }
+  .save-btn:hover { opacity: 0.85; }
+
+  .record-list { padding: 16px 20px 0; }
+  .record-list-label { font-size: 10px; color: var(--text3); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+  .record-dot {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 8px; border-radius: 6px; cursor: pointer;
+    font-size: 12px; color: var(--text2); transition: background 0.1s;
+  }
+  .record-dot:hover { background: var(--surface2); }
+  .record-dot .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+  .toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    background: var(--text); color: #fff; padding: 10px 20px;
+    border-radius: 20px; font-size: 13px; font-weight: 500;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    z-index: 999; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+
+  /* ── Page header ── */
+  .page-header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-bottom: 28px; padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-date { font-size: 24px; font-weight: 600; letter-spacing: -0.5px; }
+  .page-date-sub { font-size: 13px; color: var(--text3); margin-top: 2px; }
+  .pnl-row { display: flex; align-items: center; gap: 8px; }
+  .pnl-label { font-size: 12px; color: var(--text3); }
+  .pnl-input {
+    width: 130px; padding: 7px 10px; border: 1px solid var(--border2);
+    border-radius: var(--radius); font-size: 14px; font-weight: 500;
+    background: var(--surface2); color: var(--text); outline: none;
+    text-align: right;
+  }
+  .pnl-input:focus { border-color: var(--text); }
+
+  /* ── Tabs ── */
+  .tab-nav {
+    display: flex; gap: 2px; margin-bottom: 24px;
+    background: var(--surface2); border-radius: var(--radius);
+    padding: 3px;
+  }
+  .tab-btn {
+    flex: 1; padding: 8px; border: none; background: none;
+    font-size: 13px; color: var(--text2); border-radius: 6px;
+    cursor: pointer; transition: all 0.15s; font-weight: 500;
+  }
+  .tab-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 28px; }
+  .section-title {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.05em;
+    text-transform: uppercase; color: var(--text3);
+    margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── Metric grid ── */
+  .metric-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 10px; margin-bottom: 10px;
+  }
+  .metric-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 12px 14px;
+  }
+  .metric-card .mc-name {
+    font-size: 11px; font-weight: 600; color: var(--text3);
+    letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 6px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .mc-new { font-size: 9px; background: var(--amber-bg); color: var(--amber); padding: 1px 5px; border-radius: 4px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+  .metric-card .mc-row { display: flex; align-items: center; gap: 6px; }
+  .metric-card input[type=text] {
+    flex: 1; font-size: 16px; font-weight: 600; border: none;
+    border-bottom: 1.5px solid var(--border); padding: 3px 0;
+    background: transparent; color: var(--text); outline: none;
+    min-width: 0;
+  }
+  .metric-card input[type=text]:focus { border-bottom-color: var(--text); }
+  .dir-sel {
+    font-size: 14px; border: 1px solid var(--border2); border-radius: 5px;
+    background: var(--surface2); color: var(--text2); padding: 3px 5px;
+    cursor: pointer; outline: none;
+  }
+  .metric-reason {
+    font-size: 11px; color: var(--text3); margin-top: 7px;
+    line-height: 1.55; padding-top: 7px; border-top: 1px solid var(--border);
+  }
+
+  .spread-bar {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; color: var(--text2);
+  }
+  .spread-bar .sv { font-size: 15px; font-weight: 600; color: var(--text); }
+  .spread-bar .hint { font-size: 11px; color: var(--text3); margin-left: auto; }
+
+  /* ── Form elements ── */
+  .form-row { margin-bottom: 14px; }
+  .form-label {
+    display: block; font-size: 11px; font-weight: 600; color: var(--text3);
+    letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 6px;
+  }
+  .form-row textarea, .form-row input[type=text] {
+    width: 100%; padding: 10px 12px;
+    border: 1px solid var(--border2); border-radius: var(--radius);
+    font-size: 13px; color: var(--text); background: var(--surface);
+    outline: none; font-family: inherit; line-height: 1.6;
+    resize: vertical; transition: border-color 0.15s;
+  }
+  .form-row textarea { min-height: 130px; }
+  .form-row textarea.tall { min-height: 200px; }
+
+  /* ── Rich text editor (서식 있는 글쓰기) ── */
+  .rte-wrap { border: 1px solid var(--border2); border-radius: var(--radius); background: var(--surface); overflow: hidden; transition: border-color 0.15s; }
+  .rte-wrap:focus-within { border-color: var(--text); }
+  .rte-toolbar { display: flex; gap: 3px; padding: 5px 6px; background: var(--surface2); border-bottom: 1px solid var(--border); }
+  .rte-btn {
+    border: 1px solid transparent; background: none; color: var(--text2);
+    font-size: 12px; padding: 4px 9px; border-radius: 5px; cursor: pointer;
+    line-height: 1.2; transition: background 0.1s;
+  }
+  .rte-btn:hover { background: var(--surface); border-color: var(--border2); }
+  .rte-btn.rte-active { background: var(--text); color: #fff; }
+  .rte-sep { width: 1px; background: var(--border2); margin: 2px 3px; }
+  .rte-editor {
+    width: 100%; min-height: 130px; padding: 10px 12px;
+    font-size: 13px; color: var(--text); line-height: 1.6;
+    outline: none; resize: vertical; overflow-y: auto;
+  }
+  .rte-editor.tall { min-height: 200px; }
+  .rte-editor[data-placeholder]:empty::before {
+    content: attr(data-placeholder); color: var(--text3); pointer-events: none;
+  }
+  .rte-editor b, .rte-editor strong { font-weight: 700; }
+  .form-row textarea:focus, .form-row input[type=text]:focus { border-color: var(--text); }
+  .reason-note {
+    font-size: 11px; color: var(--text3); margin-top: 6px;
+    line-height: 1.55; padding: 8px 10px;
+    background: var(--surface2); border-radius: 6px;
+    border-left: 2px solid var(--border2);
+  }
+
+  /* ── Emotion chips ── */
+  .emotion-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .emotion-chip {
+    font-size: 12px; padding: 5px 12px;
+    border: 1px solid var(--border2); border-radius: 20px;
+    cursor: pointer; color: var(--text2); background: var(--surface);
+    transition: all 0.15s; user-select: none;
+  }
+  .emotion-chip:hover { border-color: var(--border2); background: var(--surface2); }
+  .emotion-chip.on { border-color: var(--blue); background: var(--blue-bg); color: var(--blue); font-weight: 500; }
+
+  /* ── Trade block ── */
+  .trade-block {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 14px 16px; margin-bottom: 10px;
+  }
+  .trade-header { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+  .trade-type-sel {
+    font-size: 13px; font-weight: 500; border: 1px solid var(--border2);
+    border-radius: 6px; padding: 5px 8px; background: var(--surface2);
+    color: var(--text); outline: none; cursor: pointer;
+  }
+  .ti { display: inline-flex; align-items: center; }
+  input.trade-inp {
+    font-size: 13px; border: 1px solid var(--border2); border-radius: 6px;
+    padding: 5px 8px; background: var(--surface2); color: var(--text);
+    outline: none;
+  }
+  input.trade-inp:focus { border-color: var(--text); }
+  .trade-inp.ticker { flex: 1; min-width: 80px; }
+  .trade-inp.qty { width: 70px; }
+  .trade-inp.price { width: 90px; }
+  .del-btn {
+    margin-left: auto; border: none; background: none;
+    color: var(--text3); font-size: 18px; cursor: pointer;
+    line-height: 1; padding: 0 4px;
+  }
+  .del-btn:hover { color: var(--red); }
+
+  /* ── Principle checks ── */
+  .principle-list { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+  .principle-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+  }
+  .principle-item:last-child { border-bottom: none; }
+  .principle-item input[type=checkbox] { margin-top: 2px; width: 15px; height: 15px; flex-shrink: 0; cursor: pointer; accent-color: var(--green); }
+  .p-main { font-size: 13px; color: var(--text); }
+  .p-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  /* ── Add button ── */
+  .add-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border: 1px dashed var(--border2);
+    border-radius: var(--radius); background: none;
+    color: var(--text2); font-size: 13px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .add-btn:hover { background: var(--surface); border-color: var(--text); color: var(--text); }
+
+  /* ── Calendar ── */
+  .cal-group { margin-bottom: 24px; }
+  .cal-group-title {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .cal-badge {
+    font-size: 10px; font-weight: 600; padding: 3px 8px;
+    border-radius: 5px; letter-spacing: 0;
+  }
+  .badge-weekly { background: var(--blue-bg); color: var(--blue); }
+  .badge-monthly { background: var(--purple-bg); color: var(--purple); }
+  .badge-quarterly { background: var(--amber-bg); color: var(--amber); }
+
+  .cal-table { width: 100%; border-collapse: collapse; }
+  .cal-table th {
+    font-size: 11px; font-weight: 600; color: var(--text3);
+    text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .cal-table td { padding: 12px 12px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: top; }
+  .cal-table tr:last-child td { border-bottom: none; }
+  .cal-table tbody tr:hover td { background: var(--surface2); }
+  .cal-name { font-weight: 500; color: var(--text); }
+  .cal-when { font-size: 11px; color: var(--text3); margin-top: 3px; }
+  .cal-reason { font-size: 12px; color: var(--text2); line-height: 1.55; }
+  .cal-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+
+  /* ── Knowledge ── */
+  .knowledge-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 16px; margin-bottom: 10px;
+  }
+  .knowledge-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  input.k-title {
+    flex: 1; font-size: 15px; font-weight: 600; border: none;
+    border-bottom: 1.5px solid var(--border); padding: 3px 0;
+    background: transparent; color: var(--text); outline: none;
+  }
+  input.k-title:focus { border-bottom-color: var(--text); }
+  select.k-cat {
+    font-size: 11px; font-weight: 600; border: 1px solid var(--border2);
+    border-radius: 5px; padding: 3px 6px; background: var(--surface2);
+    color: var(--text2); cursor: pointer; outline: none;
+  }
+  textarea.k-body {
+    width: 100%; padding: 9px 11px; border: 1px solid var(--border2);
+    border-radius: var(--radius); font-size: 13px; color: var(--text);
+    background: var(--surface2); outline: none; font-family: inherit;
+    line-height: 1.65; resize: vertical; min-height: 150px;
+  }
+  textarea.k-body:focus { border-color: var(--text); background: var(--surface); }
+
+  /* ── Knowledge Image Upload ── */
+  .k-img-zone {
+    margin-top: 10px; border: 1.5px dashed var(--border2);
+    border-radius: var(--radius); padding: 10px 12px;
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer; transition: all 0.15s; background: var(--surface2);
+  }
+  .k-img-zone:hover { border-color: var(--text); background: var(--surface); }
+  .k-img-zone.dragover { border-color: var(--blue); background: var(--blue-bg); }
+  .k-img-zone-label { font-size: 12px; color: var(--text3); flex: 1; }
+  .k-img-zone-label span { color: var(--blue); font-weight: 500; }
+  .k-img-input { display: none; }
+  .k-img-uploading { font-size: 12px; color: var(--amber); font-weight: 500; }
+
+  .k-img-grid {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
+  }
+  .k-img-item {
+    position: relative; width: 90px; height: 90px;
+    border-radius: var(--radius); overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .k-img-item img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    cursor: pointer; transition: opacity 0.15s;
+  }
+  .k-img-item img:hover { opacity: 0.85; }
+  .k-img-del {
+    position: absolute; top: 3px; right: 3px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(0,0,0,0.55); color: #fff;
+    border: none; cursor: pointer; font-size: 11px;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1; opacity: 0; transition: opacity 0.15s;
+  }
+  .k-img-item:hover .k-img-del { opacity: 1; }
+
+  /* ── Image Lightbox ── */
+  .img-lightbox {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.82);
+    z-index: 200; display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.18s;
+  }
+  .img-lightbox.open { opacity: 1; pointer-events: all; }
+  .img-lightbox img { max-width: 90vw; max-height: 88vh; border-radius: var(--radius-lg); box-shadow: 0 8px 40px rgba(0,0,0,0.5); }
+  .img-lightbox-close {
+    position: fixed; top: 20px; right: 24px;
+    font-size: 28px; color: #fff; cursor: pointer;
+    background: none; border: none; line-height: 1; opacity: 0.8;
+  }
+  .img-lightbox-close:hover { opacity: 1; }
+
+  /* ── Auto Indicator Banner ── */
+  .auto-indicator-bar {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 10px 16px;
+    margin-bottom: 16px; display: flex; align-items: center;
+    gap: 6px; font-size: 11px; color: var(--text3);
+    flex-wrap: wrap;
+  }
+  .auto-ind-status { font-weight: 600; }
+  .auto-ind-status.loading { color: var(--amber); }
+  .auto-ind-status.done { color: var(--green); }
+  .auto-ind-status.error { color: var(--red); }
+  .auto-ind-refresh {
+    margin-left: auto; font-size: 11px; padding: 3px 10px;
+    border: 1px solid var(--border2); border-radius: 5px;
+    background: var(--surface2); color: var(--text2); cursor: pointer;
+  }
+  .auto-ind-refresh:hover { background: var(--surface); border-color: var(--text); color: var(--text); }
+
+  /* ── History view ── */
+  .history-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .history-title { font-size: 18px; font-weight: 600; }
+  .history-grid { display: grid; gap: 8px; }
+  .history-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 14px 16px;
+    display: flex; align-items: center; gap: 14px; cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .history-card:hover { border-color: var(--text); }
+  .h-date { font-size: 14px; font-weight: 600; min-width: 90px; }
+  .h-pnl { font-size: 13px; font-weight: 500; min-width: 80px; text-align: right; }
+  .h-pnl.pos { color: var(--red); }
+  .h-pnl.neg { color: var(--blue); }
+  .h-preview { font-size: 12px; color: var(--text3); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .h-del { font-size: 12px; color: var(--text3); padding: 4px 8px; border: 1px solid var(--border); border-radius: 5px; background: none; cursor: pointer; }
+  .h-del:hover { background: var(--red-bg); color: var(--red); border-color: var(--red); }
+  .empty-state { text-align: center; padding: 60px 0; color: var(--text3); font-size: 14px; }
+
+  select, input, textarea, button { font-family: inherit; }
+
+  /* ── Checklist ── */
+  .cl-level-btn, .cl-mkt-btn {
+    padding:5px 14px; border:1px solid var(--border2); border-radius:20px;
+    background:var(--surface); color:var(--text2); font-size:12px;
+    font-weight:500; cursor:pointer; transition:all 0.15s;
+  }
+  .cl-level-btn:hover, .cl-mkt-btn:hover { border-color:var(--text); color:var(--text); }
+  .cl-level-btn.active { background:var(--text); color:#fff; border-color:var(--text); }
+  .cl-mkt-btn.active { background:var(--blue-bg); color:var(--blue); border-color:var(--blue); }
+  .cl-section { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:14px 16px; margin-bottom:12px; }
+  .cl-section-title { font-size:11px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:var(--text3); margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+  .cl-item { display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); }
+  .cl-item:last-child { border-bottom:none; }
+  .cl-checkbox { width:17px; height:17px; border:1.5px solid var(--border2); border-radius:4px; flex-shrink:0; margin-top:2px; cursor:pointer; appearance:none; -webkit-appearance:none; accent-color:var(--green); transition:all 0.15s; }
+  .cl-checkbox:checked { background:var(--green); border-color:var(--green); }
+  .cl-title { font-size:13px; font-weight:500; color:var(--text); margin-bottom:3px; }
+  .cl-desc { font-size:12px; color:var(--text2); line-height:1.55; }
+  .cl-sources { display:flex; flex-wrap:wrap; gap:5px; margin-top:5px; }
+  .cl-badge { font-size:10px; font-weight:600; padding:2px 8px; border-radius:10px; }
+  .cl-badge-kr { background:var(--blue-bg); color:var(--blue); }
+  .cl-badge-us { background:var(--green-bg); color:var(--green); }
+  .cl-badge-all { background:var(--purple-bg); color:var(--purple); }
+  .cl-saved-item { display:flex; align-items:center; gap:10px; padding:8px 12px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:6px; cursor:pointer; transition:border-color 0.15s; font-size:13px; }
+  .cl-saved-item:hover { border-color:var(--text); }
+  .cl-saved-ticker { font-weight:600; color:var(--text); min-width:90px; }
+  .cl-saved-meta { color:var(--text3); font-size:12px; flex:1; }
+  .cl-saved-pct { font-size:12px; font-weight:500; color:var(--green); }
+  .cl-saved-del { font-size:12px; padding:3px 8px; border:1px solid var(--border); border-radius:5px; background:none; color:var(--text3); cursor:pointer; }
+  .cl-saved-del:hover { background:var(--red-bg); color:var(--red); border-color:var(--red); }
+
+  /* ── Monthly Calendar View ── */
+
+  .mcal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px; padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .mcal-title { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
+  .mcal-nav { display: flex; align-items: center; gap: 8px; }
+  .mcal-nav-btn {
+    width: 32px; height: 32px; border: 1px solid var(--border2);
+    border-radius: var(--radius); background: var(--surface);
+    cursor: pointer; font-size: 16px; display: flex; align-items: center;
+    justify-content: center; color: var(--text2); transition: all 0.15s;
+  }
+  .mcal-nav-btn:hover { background: var(--surface2); border-color: var(--text); color: var(--text); }
+  .mcal-today-btn {
+    padding: 6px 12px; border: 1px solid var(--border2);
+    border-radius: var(--radius); background: var(--surface);
+    cursor: pointer; font-size: 12px; font-weight: 500; color: var(--text2);
+    transition: all 0.15s;
+  }
+  .mcal-today-btn:hover { background: var(--text); color: #fff; border-color: var(--text); }
+
+  .mcal-save-btn {
+    padding: 8px 16px; background: var(--text); color: #fff;
+    border: none; border-radius: var(--radius); font-size: 13px;
+    font-weight: 500; cursor: pointer; transition: opacity 0.15s;
+  }
+  .mcal-save-btn:hover { opacity: 0.82; }
+
+  .mcal-grid-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); overflow: hidden;
+  }
+
+  .mcal-weekdays {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    border-bottom: 1px solid var(--border);
+  }
+  .mcal-weekday {
+    padding: 10px 0; text-align: center;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+    text-transform: uppercase; color: var(--text3);
+    background: var(--surface2);
+  }
+  .mcal-weekday.sun { color: var(--red); }
+  .mcal-weekday.sat { color: var(--blue); }
+
+  .mcal-days {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+  }
+  .mcal-day {
+    min-height: 110px; border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border); padding: 8px;
+    position: relative; cursor: pointer; transition: background 0.1s;
+    vertical-align: top;
+  }
+  .mcal-day:nth-child(7n) { border-right: none; }
+  .mcal-day:hover { background: #fafaf9; }
+  .mcal-day.other-month { background: var(--surface2); }
+  .mcal-day.other-month .mcal-day-num { color: var(--text3); opacity: 0.5; }
+  .mcal-day.today .mcal-day-num {
+    background: var(--text); color: #fff;
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+  }
+  .mcal-day-num {
+    font-size: 12px; font-weight: 600; color: var(--text);
+    margin-bottom: 5px; line-height: 1;
+  }
+  .mcal-day.sun-col .mcal-day-num { color: var(--red); }
+  .mcal-day.sat-col .mcal-day-num { color: var(--blue); }
+  .mcal-day.today.sun-col .mcal-day-num,
+  .mcal-day.today.sat-col .mcal-day-num { color: #fff; }
+
+  .mcal-event {
+    font-size: 10px; padding: 2px 6px; border-radius: 4px;
+    margin-bottom: 3px; line-height: 1.4; cursor: pointer;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font-weight: 500; transition: opacity 0.1s;
+    display: flex; align-items: center; gap: 3px;
+  }
+  .mcal-event:hover { opacity: 0.78; }
+  .mcal-event.type-macro { background: var(--blue-bg); color: var(--blue); }
+  .mcal-event.type-earnings { background: var(--amber-bg); color: var(--amber); }
+  .mcal-event.type-portfolio { background: var(--green-bg); color: var(--green); }
+  .mcal-event.type-personal { background: var(--purple-bg); color: var(--purple); }
+  .mcal-event.type-risk { background: var(--red-bg); color: var(--red); }
+  .mcal-event-del {
+    margin-left: auto; opacity: 0; font-size: 11px; font-weight: 700;
+    flex-shrink: 0; line-height: 1;
+  }
+  .mcal-event:hover .mcal-event-del { opacity: 0.6; }
+  .mcal-event-del:hover { opacity: 1 !important; }
+
+  .mcal-more {
+    font-size: 10px; color: var(--text3); font-weight: 500;
+    padding: 1px 4px; cursor: pointer;
+  }
+  .mcal-more:hover { color: var(--text); }
+
+  /* Event modal */
+  .mcal-modal-bg {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.3);
+    z-index: 100; display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.18s;
+  }
+  .mcal-modal-bg.open { opacity: 1; pointer-events: all; }
+  .mcal-modal {
+    background: var(--surface); border-radius: var(--radius-lg);
+    padding: 24px; width: 380px; max-width: 95vw;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+    transform: translateY(8px); transition: transform 0.18s;
+  }
+  .mcal-modal-bg.open .mcal-modal { transform: translateY(0); }
+  .mcal-modal-title { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
+  .mcal-modal label { font-size: 11px; font-weight: 600; color: var(--text3); letter-spacing: 0.04em; text-transform: uppercase; display: block; margin-bottom: 5px; margin-top: 12px; }
+  .mcal-modal label:first-of-type { margin-top: 0; }
+  .mcal-modal input[type=text], .mcal-modal select, .mcal-modal textarea {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--border2);
+    border-radius: var(--radius); font-size: 13px; color: var(--text);
+    background: var(--surface2); outline: none; font-family: inherit;
+  }
+  .mcal-modal input[type=text]:focus, .mcal-modal select:focus,
+  .mcal-modal textarea:focus { border-color: var(--text); background: var(--surface); }
+  .mcal-modal-footer {
+    display: flex; gap: 8px; margin-top: 18px; justify-content: flex-end;
+  }
+  .mcal-modal-cancel {
+    padding: 8px 16px; border: 1px solid var(--border2);
+    border-radius: var(--radius); background: var(--surface2);
+    color: var(--text2); font-size: 13px; cursor: pointer;
+  }
+  .mcal-modal-cancel:hover { background: var(--border); }
+  .mcal-modal-add {
+    padding: 8px 20px; background: var(--text); color: #fff;
+    border: none; border-radius: var(--radius); font-size: 13px;
+    font-weight: 500; cursor: pointer;
+  }
+  .mcal-modal-add:hover { opacity: 0.85; }
+
+  /* Day detail panel */
+  .mcal-detail {
+    margin-top: 20px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 18px 20px;
+  }
+  .mcal-detail-title {
+    font-size: 14px; font-weight: 600; margin-bottom: 14px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .mcal-detail-close {
+    font-size: 18px; color: var(--text3); cursor: pointer; border: none;
+    background: none; line-height: 1; padding: 0;
+  }
+  .mcal-detail-close:hover { color: var(--text); }
+  .mcal-detail-event {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .mcal-detail-event:last-child { border-bottom: none; }
+  .mcal-detail-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px;
+  }
+  .mcal-detail-content .de-title { font-size: 13px; font-weight: 500; }
+  .mcal-detail-content .de-time { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .mcal-detail-content .de-memo { font-size: 12px; color: var(--text2); margin-top: 4px; line-height: 1.55; }
+  .mcal-detail-del-btn {
+    margin-left: auto; flex-shrink: 0; font-size: 12px; color: var(--text3);
+    padding: 3px 8px; border: 1px solid var(--border); border-radius: 5px;
+    background: none; cursor: pointer;
+  }
+  .mcal-detail-del-btn:hover { background: var(--red-bg); color: var(--red); border-color: var(--red); }
+
+  .mcal-legend {
+    display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px;
+    padding-top: 16px; border-top: 1px solid var(--border);
+  }
+  .mcal-legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text2); }
+  .mcal-legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-title">📈 투자 일지</div>
+      <div class="logo-sub">매일 기록, 데이터로 성장</div>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-label">기록</div>
+      <button class="nav-btn active" onclick="showView(&#39;journal&#39;)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        오늘 일지 작성
+      </button>
+      <button class="nav-btn" onclick="showView(&#39;history&#39;)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"></path><circle cx="12" cy="12" r="9"></circle></svg>
+        기록 히스토리
+      </button>
+      <button class="nav-btn" onclick="showView(&#39;monthly&#39;)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="8" y1="14" x2="8" y2="14.01" stroke-width="3"></line><line x1="12" y1="14" x2="12" y2="14.01" stroke-width="3"></line><line x1="16" y1="14" x2="16" y2="14.01" stroke-width="3"></line></svg>
+        월간 캘린더
+      </button>
+      <button class="nav-btn" onclick="showView(&#39;knowledgeArchive&#39;)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6 6 1-4.5 4.5 1 6-5.5-3-5.5 3 1-6L3 9l6-1z"></path></svg>
+        경제 지식 모음
+      </button>
+      <div class="nav-label" style="margin-top:8px;">분석 도구</div>
+      <button class="nav-btn" onclick="showView(&#39;checklist&#39;)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path></svg>
+        종목분석 체크리스트
+      </button>
+    </div>
+
+    <div class="date-picker-wrap">
+      <label>날짜 선택</label>
+      <input type="date" id="journal-date">
+      <button class="save-btn" onclick="saveJournal()">💾 저장</button>
+    </div>
+
+    <div class="record-list">
+      <div class="record-list-label">최근 저장</div>
+      <div id="recent-list"><div class="record-dot"><span class="dot"></span><span>6/20 </span></div><div class="record-dot"><span class="dot"></span><span>6/18 </span></div><div class="record-dot"><span class="dot"></span><span>6/14 </span></div></div>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main class="main">
+
+    <!-- Journal View -->
+    <div id="view-journal" style="">
+      <div class="page-header">
+        <div>
+          <div class="page-date" id="header-date">2026년 6월 20일</div>
+          <div class="page-date-sub" id="header-weekday">토요일</div>
+        </div>
+        <div class="pnl-row">
+          <span class="pnl-label">오늘 손익</span>
+          <input class="pnl-input" type="text" id="pnl-input" placeholder="+₩0 / +0%">
+        </div>
+      </div>
+
+      <div class="tab-nav">
+        <button class="tab-btn" onclick="switchTab(&#39;morning&#39;)">🌅 아침 지표</button>
+        <button class="tab-btn active" onclick="switchTab(&#39;evening&#39;)">🌙 저녁 기록</button>
+        <button class="tab-btn" onclick="switchTab(&#39;calendar&#39;)">📅 경제 캘린더</button>
+        <button class="tab-btn" onclick="switchTab(&#39;knowledge&#39;)">💡 경제 지식</button>
+      </div>
+
+      <!-- ══ 아침 지표 ══ -->
+      <div id="panel-morning" class="tab-panel">
+
+        <!-- 자동 지표 로드 배너 -->
+        <div class="auto-indicator-bar" id="auto-ind-bar">
+          <span>🔄</span>
+          <span class="auto-ind-status done" id="auto-ind-status">✅ 12/12개 지표 자동 로드 완료</span>
+          <span id="auto-ind-time" style="color:var(--text3);">20:52 기준</span>
+          <button class="auto-ind-refresh" onclick="fetchAutoIndicators()">↻ 새로고침</button>
+        </div>
+
+        <div class="section">
+          <div class="section-title">매크로 &amp; 달러</div>
+          <div class="metric-grid">
+            <div class="metric-card">
+              <div class="mc-name">원/달러 환율</div>
+              <div class="mc-row"><input type="text" data-key="usdkrw" placeholder="1,375"><select class="dir-sel" data-key="usdkrw_dir"><option>→</option><option>↑</option><option>↓</option></select></div>
+              <div class="metric-reason">환율 상승 = 달러강세 = 코스피 외국인 매도 압력. 미국 보유 종목 원화 환산 수익에 직접 영향.</div>
+            </div>
+            <div class="metric-card">
+              <div class="mc-name">달러 인덱스 <span class="mc-new">DXY</span></div>
+              <div class="mc-row"><input type="text" data-key="dxy" placeholder="104.5"><select class="dir-sel" data-key="dxy_dir"><option>→</option><option>↑</option><option>↓</option></select></div>
+              <div class="metric-reason">주요 6개국 통화 대비 달러 강도. DXY 상승 = 신흥국 자금 유출, 원자재 하락 압력.</div>
+            </div>
+            <div class="metric-card">
+              <div class="mc-name">미국채 10년물</div>
+              <div class="mc-row"><input type="text" data-key="t10y" placeholder="4.35%"><select class="dir-sel" data-key="t10y_dir"><option>→</option><option>↑</option><option>↓</option></select></div>
+              <div class="metric-reason">글로벌 기준금리 벤치마크. 금리 상승 = 성장주(나스닥) 밸류에이션 압축. 모든 자산의 할인율.</div>
+            </div>
+            <div class="metric-card">
+              <div class="mc-name">미국채 2년물 <span class="mc-new">추가</span></div>
+              <div class="mc-row"><input type="text" data-key="t2y" placeholder="4.80%"><select class="dir-sel" data-key="t2y_dir"><option>→</option><option>↑</option><option>↓</option></select></div>
+              <div class="metric-reason">단기 Fed 정책 기대치 반영. 10년물과 스프레드 역전 시 경기침체 선행신호.</div>
+            </div>
+          </div>
+          <div class="spread-bar">
+            <span>장단기금리차 (10Y − 2Y)</span>
+            <span class="sv" id="spread-display" style="color: var(--green);">0.79%p</span>
+            <span class="hint">0 미만 = 역전 경고</span>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">주요 지수</div>
+          <div class="metric-grid">
+            <div class="metric-card">
+              <div class="mc-name">나스닥 100 <span class="mc-new">추가</span></div>
+              <div class="mc-row"><input type="text" data-key="ndx" placeholder="19,200"><select class="dir-sel" data-key="ndx_dir"><option>→</option><option>↑</option><option>↓</option></select></div>
+              <div class="metric-reason">QLD·TQQQ 기준지수. 전일 나스닥 방향이 레버리지 ETF 포지션 관리의 출발점.</div>
+            </div>
+            <div class="metric-card">
+              <div class="mc-name">S&amp;P 500 <span class="mc-new">추가</span></div>
+              <div class="mc-row"><input type="text" data-key="spx" placeholder="5,300"><select class="dir-sel" data-key="spx_dir"><option>→</option><option>↑</option><option>↓</option></select></div>
+              <div class="metric-reason">미국 전체 시장 체온계. NVDA·GOOGL·GLW 등 보유 종목 전반의 배경 시장.</div>
+            </div>
+            <div class="metric-card">
+              <div class="mc-name">코스피</div>
+              <div class="mc-row"><input type="text" data-key="kospi" placeholder="2,750"><select class="dir-sel" data-key="kospi_dir"><option>→</option><option>↑</option><option>↓</option></select></div>
+              <div class="metric-reason">한국 포트폴리오 배경. 원/달러·외국인 순매수와 함께 보면 수급 흐름 파악.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">원자재 &amp; 위험 지표</div>
+          <div class="metric-grid">
+            <div class="metric-card">
+              <div class="mc-name">WTI 원유</div>
+              <div class="mc-row"><input type="text" data-key="wti" placeholder="78.2"><select class="dir-sel" data-key="wti_dir"><option>→</option><option>↑</option><option>↓</option></select></div>
+              <div class="metric-reason">에너지 인플레이션 선행지표. 유가 급등 = CPI 상방 압력 = 금리인하 지연 우려. 지정학 리스크 바로미터.</div>
+            </div>
+            <div class="metric-card">
+              <div class="mc-name">금 (Gold)</div>
+              <div class="mc-row"><input type="text" data-key="gold" placeholder="2,320"><select class="dir-sel" data-key="gold_dir"><option>→</option><option>↑</option><option>↓</option></select></div>
+              <div class="metric-reason">금 급등 = 안전자산 선호(리스크오프) 신호. 달러·금리의 역방향. 지정학·달러 불신 척도.</div>
+            </div>
+            <div class="metric-card">
+              <div class="mc-name">구리 (Copper)</div>
+              <div class="mc-row"><input type="text" data-key="copper" placeholder="4.52"><select class="dir-sel" data-key="copper_dir"><option>→</option><option>↑</option><option>↓</option></select></div>
+              <div class="metric-reason">"닥터 코퍼" — 전방산업 수요 선행지표. 구리 상승 = 경기 회복 기대. AI 데이터센터 배선재 수요로도 주목.</div>
+            </div>
+            <div class="metric-card">
+              <div class="mc-name">VIX 공포지수</div>
+              <div class="mc-row"><input type="text" data-key="vix" placeholder="15.3"><select class="dir-sel" data-key="vix_dir"><option>→</option><option>↑</option><option>↓</option></select></div>
+              <div class="metric-reason">20↑ 경계, 30↑ 공포 국면. 레버리지 ETF 보유 중엔 변동성 감쇄 손실(volatility decay) 위험 커짐.</div>
+            </div>
+            <div class="metric-card">
+              <div class="mc-name">공포탐욕지수 <span class="mc-new">추가</span></div>
+              <div class="mc-row"><input type="text" data-key="fgi" placeholder="62 (탐욕)"><select class="dir-sel" data-key="fgi_dir"><option>→</option><option>↑</option><option>↓</option></select></div>
+              <div class="metric-reason">7개 지표 종합. 수치보다 방향 변화가 중요. 극단적 공포 = 역발상 매수 기회 탐색 시점.</div>
+            </div>
+            <div class="metric-card">
+              <div class="mc-name">비트코인 (BTC)</div>
+              <div class="mc-row"><input type="text" data-key="btc" placeholder="65,000"><select class="dir-sel" data-key="btc_dir"><option>→</option><option>↑</option><option>↓</option></select></div>
+              <div class="metric-reason">위험자산 선호도 프록시. 나스닥과 상관관계 높음. 급락 = 리스크오프 조기신호.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">내일 주요 경제 일정 <span style="font-size:11px;font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0;">— 저녁에 미리 확인</span></div>
+          <div class="form-row">
+            <div class="rte-wrap">
+              <div class="rte-toolbar">
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('bold')"><b>B</b></button>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('underline')"><u>U</u></button>
+                <span class="rte-sep"></span>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'3')">보통</button>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'5')">크게</button>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'6')">아주크게</button>
+                <span class="rte-sep"></span>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('removeFormat')">서식지우기</button>
+              </div>
+              <div class="rte-editor" contenteditable="true" data-key="tomorrow_schedule" data-placeholder="예) 목요일 21:30 미국 신규 실업수당 청구건수 / 금요일 새벽 3:00 FOMC 금리 결정" oninput="rteCleanup(this)"></div>
+            </div>
+          </div>
+          <div class="reason-note">다음날 일정을 미리 알면 포지션 크기 조정, 손절선 재확인 등 선제 대응 가능. 발표 당일 충동매매 방지.</div>
+        </div>
+
+      </div>
+
+      <!-- ══ 저녁 기록 ══ -->
+      <div id="panel-evening" class="tab-panel active">
+
+        <div class="section">
+          <div class="section-title">오늘 감정 상태 <span style="font-size:11px;font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0;">— 뇌동매매 방지 핵심</span></div>
+          <div class="emotion-grid" id="emotion-grid">
+            <span class="emotion-chip on" onclick="toggleChip(this)" data-val="평온">😌 평온</span>
+            <span class="emotion-chip" onclick="toggleChip(this)" data-val="불안">😰 불안</span>
+            <span class="emotion-chip" onclick="toggleChip(this)" data-val="FOMO">🔥 FOMO</span>
+            <span class="emotion-chip" onclick="toggleChip(this)" data-val="조급함">😤 조급함</span>
+            <span class="emotion-chip" onclick="toggleChip(this)" data-val="패닉">😱 패닉</span>
+            <span class="emotion-chip" onclick="toggleChip(this)" data-val="과신">🤑 과신</span>
+            <span class="emotion-chip" onclick="toggleChip(this)" data-val="손실회피">😬 손실회피</span>
+            <span class="emotion-chip" onclick="toggleChip(this)" data-val="무기력">😑 무기력</span>
+          </div>
+          <div class="form-row">
+            <div class="rte-wrap">
+              <div class="rte-toolbar">
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('bold')"><b>B</b></button>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('underline')"><u>U</u></button>
+                <span class="rte-sep"></span>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'3')">보통</button>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'5')">크게</button>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'6')">아주크게</button>
+                <span class="rte-sep"></span>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('removeFormat')">서식지우기</button>
+              </div>
+              <div class="rte-editor" contenteditable="true" data-key="emotion_memo" data-placeholder="감정 메모 (예: NVDA 하락에 손절 충동 느낌. 근거 없이 불안했음)" oninput="rteCleanup(this)"></div>
+            </div>
+          </div>
+          <div class="reason-note">뇌동매매의 99%는 감정에서 시작됨. 기록이 쌓이면 "나는 VIX 25↑일 때 패닉 매도 경향 있다" 같은 자기 데이터가 만들어짐.</div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">오늘 시장 흐름</div>
+          <div class="form-row">
+            <div class="rte-wrap">
+              <div class="rte-toolbar">
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('bold')"><b>B</b></button>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('underline')"><u>U</u></button>
+                <span class="rte-sep"></span>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'3')">보통</button>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'5')">크게</button>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'6')">아주크게</button>
+                <span class="rte-sep"></span>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('removeFormat')">서식지우기</button>
+              </div>
+              <div class="rte-editor tall" contenteditable="true" data-key="market_flow" data-placeholder="예) 나스닥 +1.2%, 반도체 섹터 강세. 10년물 소폭 하락하며 성장주 반등. 코스피는 외국인 매도로 약보합." oninput="rteCleanup(this)"></div>
+            </div>
+          </div>
+          <div class="reason-note">매일 흐름을 글로 요약하면 매크로-섹터-종목 연결고리를 체득하게 됨. 2~3개월 쌓이면 패턴 인식력이 눈에 띄게 향상됨.</div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">오늘 주요 경제 뉴스</div>
+          <div class="form-row">
+            <div class="rte-wrap">
+              <div class="rte-toolbar">
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('bold')"><b>B</b></button>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('underline')"><u>U</u></button>
+                <span class="rte-sep"></span>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'3')">보통</button>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'5')">크게</button>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'6')">아주크게</button>
+                <span class="rte-sep"></span>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('removeFormat')">서식지우기</button>
+              </div>
+              <div class="rte-editor tall" contenteditable="true" data-key="news" data-placeholder="예) Fed 위원 매파 발언으로 금리인하 기대 후퇴 / RKLB Q2 가이던스 상향 / NVDA 중국 수출규제 완화 가능성 보도" oninput="rteCleanup(this)"></div>
+            </div>
+          </div>
+          <div class="reason-note">뉴스를 한 줄이라도 기록하면 이해 깊이가 다름. 나중에 "그때 그 뉴스가 이 종목에 어떤 영향 줬나" 추적 가능.</div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">오늘 매매 기록</div>
+          <div id="trade-list"><div class="trade-block" data-idx="0">
+    <div class="trade-header">
+      <select class="trade-type-sel">
+        <option selected="">매수</option>
+        <option>매도</option>
+        <option>관망</option>
+      </select>
+      <input class="trade-inp ticker" type="text" placeholder="종목 (예: NVDA)" value="">
+      <input class="trade-inp qty" type="text" placeholder="수량" value="">
+      <input class="trade-inp price" type="text" placeholder="단가" value="">
+      <button class="del-btn" onclick="removeTrade(0)">×</button>
+    </div>
+    <div class="form-row">
+      <label class="form-label">매매 근거 (기술적 / 펀더멘털 / 이벤트)</label>
+      <textarea rows="2" placeholder="예) RSI 38 과매도 + 200일선 지지 확인. 실적발표 전 분할매수 1차."></textarea>
+    </div></div></div>
+          <button class="add-btn" onclick="addTrade()" style="margin-bottom:12px;">＋ 매매 추가</button>
+          <div class="reason-note">매매 근거를 사전에 적는 습관이 뇌동매매를 막음. "이 근거가 사라지면 청산" 조건을 미리 써두는 것이 핵심.</div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">앞으로의 대응 전략</div>
+          <div class="form-row">
+            <div class="rte-wrap">
+              <div class="rte-toolbar">
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('bold')"><b>B</b></button>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('underline')"><u>U</u></button>
+                <span class="rte-sep"></span>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'3')">보통</button>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'5')">크게</button>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'6')">아주크게</button>
+                <span class="rte-sep"></span>
+                <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('removeFormat')">서식지우기</button>
+              </div>
+              <div class="rte-editor tall" contenteditable="true" data-key="strategy" data-placeholder="예) RKLB — 현 레벨 홀드, $18 지지선에서 추가매수 고려. NVDA — 신고가 돌파 시 비중 확대. GLW — 인사이더 매도 추이 계속 모니터링." oninput="rteCleanup(this)"></div>
+            </div>
+          </div>
+          <div class="reason-note">전략을 글로 써두면 시장 변동 때 "계획에 있는 행동인가 아닌가"를 즉시 판단 가능. 충동 행동의 마찰 역할.</div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">투자 원칙 체크</div>
+          <div class="principle-list">
+            <div class="principle-item"><input type="checkbox" data-key="p1"><div><div class="p-main">매매 근거 없이 감으로 행동하지 않았다</div><div class="p-sub">직감과 근거 기반 판단을 구분하는 훈련</div></div></div>
+            <div class="principle-item"><input type="checkbox" data-key="p2"><div><div class="p-main">종목당 비중 한도를 지켰다</div><div class="p-sub">집중 포지션으로 인한 강제청산 방지</div></div></div>
+            <div class="principle-item"><input type="checkbox" data-key="p3"><div><div class="p-main">손절선을 미리 설정하고 진입했다</div><div class="p-sub">손실이 나도 "계획된 손실"이면 전략적 패배</div></div></div>
+            <div class="principle-item"><input type="checkbox" data-key="p4"><div><div class="p-main">FOMO로 고점 추격 매수하지 않았다</div><div class="p-sub">급등 직후 뉴스 확인 후 진입하는 패턴 방지</div></div></div>
+            <div class="principle-item"><input type="checkbox" data-key="p5"><div><div class="p-main">VIX 급등 시 레버리지 ETF 비중을 점검했다</div><div class="p-sub">변동성 감쇄(volatility decay) 구간 노출 관리</div></div></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ 경제 캘린더 ══ -->
+      <div id="panel-calendar" class="tab-panel">
+        <p style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.7;">발표 시간은 한국시간 기준. 서머타임(3월 둘째 일~11월 첫째 일)엔 미국 발표가 1시간 앞당겨짐.</p>
+
+        <div class="cal-group">
+          <div class="cal-group-title"><span class="cal-badge badge-weekly">주간</span> 매주 확인</div>
+          <div class="cal-wrap">
+            <table class="cal-table">
+              <thead><tr><th style="width:160px">지표</th><th style="width:160px">발표 일정</th><th>왜 보나</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><div class="cal-name">미국 신규 실업수당 청구건수</div><div class="cal-when">Initial Jobless Claims</div></td>
+                  <td><div class="cal-when">매주 <strong>목요일</strong><br>한국시간 21:30 (서머타임)<br>22:30 (표준시)</div></td>
+                  <td><div class="cal-reason">고용시장 건강도 주간 체온계. 청구건수 증가 = 고용 둔화 = Fed 금리인하 기대 상승. 노이즈 많으므로 4주 이동평균 추세를 봐야 함.</div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="cal-group">
+          <div class="cal-group-title"><span class="cal-badge badge-monthly">월간</span> 매월 확인</div>
+          <div class="cal-wrap">
+            <table class="cal-table">
+              <thead><tr><th style="width:160px">지표</th><th style="width:160px">발표 일정</th><th>왜 보나</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><div class="cal-name">비농업 고용 (NFP)</div><div class="cal-when">Non-Farm Payrolls</div></td>
+                  <td><div class="cal-when">매월 <strong>첫째 금요일</strong><br>한국시간 21:30</div></td>
+                  <td><div class="cal-reason">가장 중요한 고용 지표. 예상치 대비 차이 클 때 시장 변동성 극대화. 실업률·시간당임금 함께 확인 필수. Fed 금리결정에 직접 영향.</div></td>
+                </tr>
+                <tr>
+                  <td><div class="cal-name">미국 CPI</div><div class="cal-when">소비자물가지수</div></td>
+                  <td><div class="cal-when">매월 <strong>중순</strong> (전월 기준 약 45일 후)<br>한국시간 21:30</div></td>
+                  <td><div class="cal-reason">대중이 체감하는 인플레이션 헤드라인. Core CPI(에너지·식품 제외)가 더 중요. 예상치 상회 = 금리인하 기대 꺾임 = 성장주 하락 압력.</div></td>
+                </tr>
+                <tr>
+                  <td><div class="cal-name">미국 PPI</div><div class="cal-when">생산자물가지수</div></td>
+                  <td><div class="cal-when">CPI 발표 <strong>1~2일 후</strong><br>한국시간 21:30</div></td>
+                  <td><div class="cal-reason">기업 비용 압력 선행지표. CPI보다 1~2개월 선행하는 경향. PPI 상승 → 기업 마진 압축 → 이익 하향 우려.</div></td>
+                </tr>
+                <tr>
+                  <td><div class="cal-name">미국 PCE</div><div class="cal-when">개인소비지출물가 (Core)</div></td>
+                  <td><div class="cal-when">매월 <strong>말 금요일</strong><br>한국시간 21:30</div></td>
+                  <td><div class="cal-reason">Fed가 공식 목표로 삼는 물가지표 (목표 2%). CPI보다 Fed에 더 중요. Core PCE가 핵심. CPI 약 2주 후 나오므로 정도를 확인하는 성격.</div></td>
+                </tr>
+                <tr>
+                  <td><div class="cal-name">한국은행 금통위</div><div class="cal-when">금융통화위원회</div></td>
+                  <td><div class="cal-when">연 8회 (격월 + 임시)<br>오전 <strong>10:00</strong></div></td>
+                  <td><div class="cal-reason">기준금리 결정. 한국 부동산·전세시장 직접 영향. 한/미 금리차 벌어질수록 원화 약세 압력. 의결문·총재 기자회견 발언 뉘앙스 중요.</div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="cal-group">
+          <div class="cal-group-title"><span class="cal-badge badge-quarterly">분기</span> 분기별 확인</div>
+          <div class="cal-wrap">
+            <table class="cal-table">
+              <thead><tr><th style="width:160px">지표</th><th style="width:160px">발표 일정</th><th>왜 보나</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><div class="cal-name">FOMC 금리 결정</div><div class="cal-when">연방공개시장위원회</div></td>
+                  <td><div class="cal-when">연 <strong>8회</strong> (약 6주마다)<br>한국시간 새벽 <strong>3:00</strong><br>파월 기자회견 3:30</div></td>
+                  <td><div class="cal-reason">미국 기준금리 결정. 가장 강력한 시장 이벤트. 점도표(dot plot)로 향후 경로 파악. 파월 발언 한 마디에 나스닥 ±2% 흔들림.</div></td>
+                </tr>
+                <tr>
+                  <td><div class="cal-name">미국 GDP 속보치</div><div class="cal-when">Advance GDP Estimate</div></td>
+                  <td><div class="cal-when">분기별 (1·4·7·10월)<br>전 분기 말 기준 약 30일 후<br>한국시간 21:30</div></td>
+                  <td><div class="cal-reason">경제 성장률 공식 확인. 컨센서스 대비 큰 차이 시 금리 경로 기대 재조정. 속보치→수정치→확정치 3번 중 속보치가 시장 영향 최대.</div></td>
+                </tr>
+                <tr>
+                  <td><div class="cal-name">실적 시즌</div><div class="cal-when">Earnings Season</div></td>
+                  <td><div class="cal-when">분기 종료 후 2~6주<br>1·4·7·10월 집중</div></td>
+                  <td><div class="cal-reason">보유 종목 펀더멘털 직접 확인 기회. EPS·매출 컨센서스 대비, 가이던스, 경영진 코멘트가 핵심. 일정 미리 파악 후 포지션 사이즈 조정.</div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ 경제 지식 ══ -->
+      <div id="panel-knowledge" class="tab-panel">
+        <p style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.7;">투자하며 새로 배운 개념, 읽은 자료, 깨달은 원칙을 기록. 쌓이면 나만의 경제 사전이 됨.</p>
+        <div id="knowledge-list"><div class="knowledge-card" data-idx="0">
+    <div class="knowledge-header">
+      <input class="k-title" type="text" placeholder="개념명 (예: 장단기금리차 역전)" value="">
+      <select class="k-cat"><option selected="">매크로</option><option>기술적분석</option><option>펀더멘털</option><option>심리/행동경제학</option><option>파생/ETF</option><option>한국경제</option><option>기타</option></select>
+      <button onclick="removeKnowledge(0)" style="border:none;background:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0 4px;line-height:1;">×</button>
+    </div>
+    <div class="rte-wrap">
+      <div class="rte-toolbar">
+        <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('bold')"><b>B</b></button>
+        <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('underline')"><u>U</u></button>
+        <span class="rte-sep"></span>
+        <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'3')">보통</button>
+        <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'5')">크게</button>
+        <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'6')">아주크게</button>
+        <span class="rte-sep"></span>
+        <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('removeFormat')">서식지우기</button>
+      </div>
+      <div class="k-body rte-editor" contenteditable="true" data-placeholder="내용 & 내 포트폴리오에 주는 시사점 (예: 장단기금리차 역전 → 평균 14개월 후 경기침체. 현재 -0.3%p. QLD 비중 점검 시그널로 활용.)" onpaste="kImgPasteHandler(event,0)" oninput="rteCleanup(this)"></div>
+    </div>
+    <div class="k-img-grid" id="k-img-grid-0"></div>
+    <div class="k-img-zone" id="k-img-zone-0" onclick="document.getElementById(&#39;k-img-input-0&#39;).click()" ondragover="kImgDragOver(event,0)" ondragleave="kImgDragLeave(event,0)" ondrop="kImgDrop(event,0)">
+      <span style="font-size:16px;">📎</span>
+      <div class="k-img-zone-label"><span>이미지 첨부</span> — 클릭 · 드래그앤드롭 · 본문에 Ctrl+V 붙여넣기 (차트·스크린샷·자료)</div>
+      <div class="k-img-uploading" id="k-img-uploading-0" style="display:none;">⏳ 업로드 중...</div>
+    </div>
+    <input type="file" class="k-img-input" id="k-img-input-0" accept="image/*" multiple="" onchange="kImgUpload(this,0)"></div></div>
+        <button class="add-btn" onclick="addKnowledge()">＋ 개념 추가</button>
+      </div>
+
+    </div>
+
+    <!-- History View -->
+    <div id="view-history" style="display:none;">
+      <div class="history-header">
+        <div class="history-title">기록 히스토리</div>
+        <div style="font-size:12px;color:var(--text3);" id="history-count"></div>
+      </div>
+      <div id="history-grid" class="history-grid"></div>
+    </div>
+
+    <!-- Knowledge Archive View -->
+    <div id="view-knowledgeArchive" style="display:none;">
+      <div class="history-header">
+        <div class="history-title">경제 지식 모음</div>
+        <div style="font-size:12px;color:var(--text3);" id="ka-count"></div>
+      </div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.7;">매일 저녁 기록의 "💡 경제 지식" 탭에 적은 내용이 날짜와 상관없이 여기 한곳에 자동으로 모여요.</p>
+      <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center;">
+        <input type="text" id="ka-search" placeholder="🔍 제목·내용 검색" style="flex:1;min-width:180px;padding:8px 12px;border:1px solid var(--border2);border-radius:var(--radius);font-size:13px;background:var(--surface);outline:none;" oninput="renderKnowledgeArchive()">
+        <select id="ka-cat-filter" style="padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius);font-size:13px;background:var(--surface);outline:none;" onchange="renderKnowledgeArchive()">
+          <option value="">전체 카테고리</option>
+          <option value="매크로">매크로</option>
+          <option value="기술적분석">기술적분석</option>
+          <option value="펀더멘털">펀더멘털</option>
+          <option value="심리/행동경제학">심리/행동경제학</option>
+          <option value="파생/ETF">파생/ETF</option>
+          <option value="한국경제">한국경제</option>
+          <option value="기타">기타</option>
+        </select>
+      </div>
+      <div id="ka-list"></div>
+    </div>
+
+    <!-- Checklist View -->
+    <div id="view-checklist" style="display:none;">
+      <div class="page-header">
+        <div>
+          <div class="page-date">종목분석 체크리스트</div>
+          <div class="page-date-sub">매수 전 필수 점검 — 기록은 자동 저장</div>
+        </div>
+      </div>
+
+      <!-- 종목 입력 + 레벨/마켓 필터 -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+        <input type="text" id="cl-ticker" placeholder="종목명 (예: NVDA, 삼성전자)" style="padding:8px 12px;border:1px solid var(--border2);border-radius:var(--radius);font-size:14px;font-weight:500;color:var(--text);background:var(--surface);outline:none;width:220px;">
+        <div style="display:flex;gap:6px;margin-left:auto;">
+          <button class="cl-level-btn active" onclick="clSetLevel('beginner',this)">초보용</button>
+          <button class="cl-level-btn" onclick="clSetLevel('advanced',this)">중급용</button>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="cl-mkt-btn active" onclick="clSetMarket('all',this)">전체</button>
+          <button class="cl-mkt-btn" onclick="clSetMarket('kr',this)">국내주</button>
+          <button class="cl-mkt-btn" onclick="clSetMarket('us',this)">미국주</button>
+        </div>
+      </div>
+
+      <!-- 진행률 -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:14px;">
+        <div style="flex:1;">
+          <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:6px;">체크 진행률 <span id="cl-progress-text" style="color:var(--text2);letter-spacing:0;">0 / 0</span></div>
+          <div style="height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;"><div id="cl-progress-fill" style="height:100%;background:var(--green);border-radius:3px;width:0%;transition:width 0.3s;"></div></div>
+        </div>
+        <button onclick="clReset()" style="font-size:12px;padding:5px 12px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface2);color:var(--text2);cursor:pointer;">초기화</button>
+        <button onclick="clSave()" style="font-size:12px;padding:5px 14px;border:none;border-radius:var(--radius);background:var(--text);color:#fff;cursor:pointer;font-weight:500;">💾 저장</button>
+      </div>
+
+      <!-- 저장된 분석 목록 -->
+      <div id="cl-saved-list" style="margin-bottom:20px;"></div>
+
+      <!-- 체크리스트 본문 -->
+      <div id="cl-container"></div>
+    </div>
+
+    <!-- Monthly Calendar View -->
+    <div id="view-monthly-cal" style="display: none;">
+      <div class="mcal-header">
+        <div>
+          <div class="mcal-title" id="mcal-month-title">2026년 6월</div>
+        </div>
+        <div class="mcal-nav">
+          <button class="mcal-nav-btn" onclick="mcalMove(-1)">‹</button>
+          <button class="mcal-today-btn" onclick="mcalGoToday()">오늘</button>
+          <button class="mcal-nav-btn" onclick="mcalMove(1)">›</button>
+          <button class="mcal-save-btn" onclick="saveMcal()">💾 저장</button>
+        </div>
+      </div>
+
+      <div class="mcal-grid-wrap">
+        <div class="mcal-weekdays">
+          <div class="mcal-weekday sun">일</div>
+          <div class="mcal-weekday">월</div>
+          <div class="mcal-weekday">화</div>
+          <div class="mcal-weekday">수</div>
+          <div class="mcal-weekday">목</div>
+          <div class="mcal-weekday">금</div>
+          <div class="mcal-weekday sat">토</div>
+        </div>
+        <div class="mcal-days" id="mcal-days-grid"><div class="mcal-day other-month sun-col"><div class="mcal-day-num">31</div></div><div class="mcal-day"><div class="mcal-day-num">1</div></div><div class="mcal-day"><div class="mcal-day-num">2</div></div><div class="mcal-day"><div class="mcal-day-num">3</div></div><div class="mcal-day"><div class="mcal-day-num">4</div></div><div class="mcal-day"><div class="mcal-day-num">5</div></div><div class="mcal-day sat-col"><div class="mcal-day-num">6</div></div><div class="mcal-day sun-col"><div class="mcal-day-num">7</div></div><div class="mcal-day"><div class="mcal-day-num">8</div></div><div class="mcal-day"><div class="mcal-day-num">9</div></div><div class="mcal-day"><div class="mcal-day-num">10</div></div><div class="mcal-day"><div class="mcal-day-num">11</div></div><div class="mcal-day"><div class="mcal-day-num">12</div></div><div class="mcal-day sat-col"><div class="mcal-day-num">13</div></div><div class="mcal-day sun-col"><div class="mcal-day-num">14</div></div><div class="mcal-day"><div class="mcal-day-num">15</div></div><div class="mcal-day"><div class="mcal-day-num">16</div></div><div class="mcal-day"><div class="mcal-day-num">17</div></div><div class="mcal-day"><div class="mcal-day-num">18</div></div><div class="mcal-day"><div class="mcal-day-num">19</div></div><div class="mcal-day sat-col"><div class="mcal-day-num">20</div></div><div class="mcal-day today sun-col"><div class="mcal-day-num">21</div></div><div class="mcal-day"><div class="mcal-day-num">22</div></div><div class="mcal-day"><div class="mcal-day-num">23</div></div><div class="mcal-day"><div class="mcal-day-num">24</div><div class="mcal-event type-earnings" title="마이크론 실적 발표"><span style="flex:1;overflow:hidden;text-overflow:ellipsis;">마이크론 실적 발표</span><span class="mcal-event-del" onclick="deleteMcalEvent(&#39;2026-06-23&#39;,0,event)">✕</span></div></div><div class="mcal-day"><div class="mcal-day-num">25</div></div><div class="mcal-day"><div class="mcal-day-num">26</div></div><div class="mcal-day sat-col"><div class="mcal-day-num">27</div></div><div class="mcal-day sun-col"><div class="mcal-day-num">28</div></div><div class="mcal-day"><div class="mcal-day-num">29</div></div><div class="mcal-day"><div class="mcal-day-num">30</div></div><div class="mcal-day other-month"><div class="mcal-day-num">1</div></div><div class="mcal-day other-month"><div class="mcal-day-num">2</div></div><div class="mcal-day other-month"><div class="mcal-day-num">3</div></div><div class="mcal-day other-month sat-col"><div class="mcal-day-num">4</div></div></div>
+      </div>
+
+      <div class="mcal-legend">
+        <div class="mcal-legend-item"><div class="mcal-legend-dot" style="background:var(--blue-bg);border:1px solid var(--blue);"></div> 매크로 지표</div>
+        <div class="mcal-legend-item"><div class="mcal-legend-dot" style="background:var(--amber-bg);border:1px solid var(--amber);"></div> 실적 발표</div>
+        <div class="mcal-legend-item"><div class="mcal-legend-dot" style="background:var(--green-bg);border:1px solid var(--green);"></div> 포트폴리오</div>
+        <div class="mcal-legend-item"><div class="mcal-legend-dot" style="background:var(--purple-bg);border:1px solid var(--purple);"></div> 개인 일정</div>
+        <div class="mcal-legend-item"><div class="mcal-legend-dot" style="background:var(--red-bg);border:1px solid var(--red);"></div> 리스크 점검</div>
+      </div>
+
+      <div class="mcal-detail" id="mcal-detail" style="">
+        <div class="mcal-detail-title">
+          <span id="mcal-detail-date-label">NaN년 NaN월 NaN일 (undefined) 일정</span>
+          <button class="mcal-detail-close" onclick="closeDetail()">×</button>
+        </div>
+        <div id="mcal-detail-list"><div style="font-size:13px;color:var(--text3);padding:8px 0;">이 날에 등록된 일정이 없어요. 캘린더에서 날짜를 클릭해 추가하세요.</div></div>
+      </div>
+    </div>
+
+    <!-- Event Add Modal -->
+    <div class="mcal-modal-bg" id="mcal-modal">
+      <div class="mcal-modal">
+        <div class="mcal-modal-title" id="mcal-modal-date-label">6월 23일 (화) 일정 추가</div>
+        <label>일정 제목</label>
+        <input type="text" id="mcal-ev-title" placeholder="예) NVDA 실적 발표, CPI 발표, 주간 리뷰">
+        <label>카테고리</label>
+        <select id="mcal-ev-type">
+          <option value="macro">📊 매크로 지표</option>
+          <option value="earnings">💰 실적 발표</option>
+          <option value="portfolio">📈 포트폴리오</option>
+          <option value="personal">🗓 개인 일정</option>
+          <option value="risk">⚠️ 리스크 점검</option>
+        </select>
+        <label>시간 (선택)</label>
+        <input type="text" id="mcal-ev-time" placeholder="예) 21:30 KST, 새벽 3:00, 장 마감 후">
+        <label>메모 (선택)</label>
+        <textarea id="mcal-ev-memo" rows="2" placeholder="예) Core CPI 전월비 예상 +0.3%. 상회 시 QLD 비중 축소 고려."></textarea>
+        <div class="mcal-modal-footer">
+          <button class="mcal-modal-cancel" onclick="closeMcalModal()">취소</button>
+          <button class="mcal-modal-add" onclick="addMcalEvent()">추가</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast" id="toast">☁️ 2026년 6월 20일 저장 완료</div>
+
+<script>
+// ── State ──
+let currentDate = todayStr();
+let trades = [];
+let knowledgeItems = [];
+
+function todayStr() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function formatDateKo(str) {
+  const d = new Date(str + 'T00:00:00');
+  const days = ['일','월','화','수','목','금','토'];
+  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
+}
+
+// ══════════════════════════════════════
+// ── 자동 경제지표 연동 ──
+// ══════════════════════════════════════
+
+// CORS 프록시 목록 (프록시 하나에 요청이 몰리지 않도록 티커마다 시작 순서를 돌려가며 사용)
+const CORS_PROXIES = [
+  (url) => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+  (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  (url) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+];
+const YF_BASE = 'https://query1.finance.yahoo.com/v8/finance/chart/';
+const YF_CACHE_MS = 3 * 60 * 1000; // 3분 — 이 안에는 같은 티커 재요청 안 하고 캐시 사용
+
+// 지표별 ticker 매핑
+const AUTO_IND_MAP = [
+  { ticker: 'KRW=X',    label: '원/달러',   dataKey: 'usdkrw' },
+  { ticker: 'DX-Y.NYB', label: 'DXY',       dataKey: 'dxy' },
+  { ticker: '^TNX',     label: '미채 10년',  dataKey: 't10y', suffix: '%' },
+  { ticker: '^IRX',     label: '미채 2년',   dataKey: 't2y',  suffix: '%' },
+  { ticker: '^NDX',     label: '나스닥 100', dataKey: 'ndx' },
+  { ticker: '^GSPC',    label: 'S&P 500',   dataKey: 'spx' },
+  { ticker: '^KS11',    label: '코스피',     dataKey: 'kospi' },
+  { ticker: 'CL=F',     label: 'WTI',       dataKey: 'wti' },
+  { ticker: 'GC=F',     label: '금',         dataKey: 'gold' },
+  { ticker: 'HG=F',     label: '구리',       dataKey: 'copper' },
+  { ticker: '^VIX',     label: 'VIX',       dataKey: 'vix' },
+];
+
+// BTC: CoinGecko (CORS 허용 — 직접 호출)
+async function fetchBTC() {
+  try {
+    const res = await fetch(
+      'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true',
+      { headers: { 'Accept': 'application/json' } }
+    );
+    if (!res.ok) throw new Error('CoinGecko ' + res.status);
+    const d = await res.json();
+    return { price: d.bitcoin?.usd, change: d.bitcoin?.usd_24h_change };
+  } catch(e) { console.warn('BTC fetch 실패:', e.message); return null; }
+}
+
+// 최근 성공한 값 메모리 캐시 (짧은 시간 안 재요청으로 프록시 부하/레이트리밋 완화)
+const yfMemCache = {};
+
+// Yahoo Finance: 프록시를 티커마다 다른 순서로 시도 (부하 분산)
+async function fetchYFTicker(ticker, proxyStartIdx = 0) {
+  const cached = yfMemCache[ticker];
+  if (cached && (Date.now() - cached.ts) < YF_CACHE_MS) return cached.data;
+
+  const targetUrl = `${YF_BASE}${encodeURIComponent(ticker)}?interval=1d&range=5d`;
+  const order = [...CORS_PROXIES.keys()].map(i => CORS_PROXIES[(i + proxyStartIdx) % CORS_PROXIES.length]);
+  for (const makeProxy of order) {
+    try {
+      const res = await fetch(makeProxy(targetUrl), { signal: AbortSignal.timeout(5500) });
+      if (!res.ok) continue;
+      const d = await res.json();
+      const meta = d?.chart?.result?.[0]?.meta;
+      if (!meta) continue;
+      const price = meta.regularMarketPrice;
+      const prev  = meta.chartPreviousClose ?? meta.previousClose;
+      const change = (prev && prev !== 0) ? ((price - prev) / prev * 100) : null;
+      const data = { price, change };
+      yfMemCache[ticker] = { data, ts: Date.now() };
+      return data;
+    } catch(e) { /* 다음 프록시 시도 */ }
+  }
+  return null;
+}
+
+// 동시에 너무 많이 쏘면 무료 프록시가 요청을 씹으므로, 소규모 배치로 나눠서 순차 처리
+async function fetchInBatches(items, worker, batchSize = 4, gapMs = 350) {
+  const results = [];
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
+    const batchResults = await Promise.allSettled(batch.map((item, j) => worker(item, i + j)));
+    results.push(...batchResults);
+    if (i + batchSize < items.length) await new Promise(r => setTimeout(r, gapMs));
+  }
+  return results;
+}
+
+function fmtPrice(val, suffix) {
+  if (val == null) return '';
+  if (suffix === '%') return val.toFixed(2) + '%';
+  if (val >= 10000) return Math.round(val).toLocaleString('en-US');
+  if (val >= 1000)  return val.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  return val.toFixed(2);
+}
+
+function setMetricAuto(dataKey, price, change, suffix) {
+  const inp = document.querySelector(`[data-key="${dataKey}"]`);
+  if (!inp) return;
+  // 이미 사용자가 직접 입력한 값이 있으면 건드리지 않음
+  if (inp.value && inp.value.trim() !== '') return;
+  if (price != null) inp.value = fmtPrice(price, suffix);
+
+  // 방향 셀렉트 자동 설정
+  const mc = inp.closest('.metric-card');
+  if (mc && change != null) {
+    const sel = mc.querySelector('.dir-sel');
+    if (sel) {
+      if      (change >  0.05) sel.value = '↑';
+      else if (change < -0.05) sel.value = '↓';
+      else                     sel.value = '→';
+    }
+  }
+  if (dataKey === 't10y' || dataKey === 't2y') calcSpread();
+}
+
+// 지정 시간 안에 안 끝나면 강제로 실패 처리하는 안전장치
+function withHardTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), ms))
+  ]);
+}
+
+async function fetchAutoIndicators() {
+  const statusEl = document.getElementById('auto-ind-status');
+  const timeEl   = document.getElementById('auto-ind-time');
+  if (statusEl) { statusEl.className = 'auto-ind-status loading'; statusEl.textContent = '시장 데이터 불러오는 중...'; }
+
+  const total = AUTO_IND_MAP.length + 1; // +BTC
+  let successCount = 0;
+
+  try {
+    await withHardTimeout((async () => {
+      // Yahoo Finance 지표 — 11개 전부 동시에, 단 프록시를 티커마다 다르게 시작해서 부하 분산 (병렬이라 빠름)
+      let results = await Promise.allSettled(
+        AUTO_IND_MAP.map((ind, idx) => fetchYFTicker(ind.ticker, idx).then(r => ({ ind, r })))
+      );
+      let failed = AUTO_IND_MAP.filter((ind, i) => !(results[i].status === 'fulfilled' && results[i].value?.r));
+
+      // 실패한 것만 바로 재시도 (다른 프록시 시작점으로, 역시 병렬 — 대기 없이 빠르게)
+      if (failed.length > 0) {
+        const retryResults = await Promise.allSettled(
+          failed.map((ind, idx) => fetchYFTicker(ind.ticker, idx + 1).then(r => ({ ind, r })))
+        );
+        results = results.concat(retryResults);
+      }
+
+      results.forEach(res => {
+        if (res.status === 'fulfilled' && res.value?.r) {
+          const { ind, r } = res.value;
+          setMetricAuto(ind.dataKey, r.price, r.change, ind.suffix);
+          successCount++;
+        }
+      });
+
+      // BTC
+      const btc = await fetchBTC();
+      if (btc?.price) { setMetricAuto('btc', btc.price, btc.change); successCount++; }
+    })(), 15000); // 15초 넘으면 강제 종료 — 절대 "불러오는 중"에 영원히 갇히지 않음
+  } catch (e) {
+    console.warn('지표 자동 로드 중 오류/타임아웃:', e.message);
+    // successCount만큼은 이미 화면에 반영돼 있으니 그대로 두고 상태 표시만 갱신
+  } finally {
+    const now = new Date();
+    const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')} 기준`;
+    if (statusEl) {
+      if (successCount > 0) {
+        statusEl.className = 'auto-ind-status done';
+        statusEl.textContent = `✅ ${successCount}/${total}개 지표 자동 로드 완료`;
+        if (timeEl) timeEl.textContent = timeStr;
+      } else {
+        statusEl.className = 'auto-ind-status error';
+        statusEl.textContent = '⚠️ 자동 로드 실패 — 직접 입력하거나 새로고침';
+        if (timeEl) timeEl.textContent = '(GitHub Pages에서는 정상 작동)';
+      }
+    }
+  }
+}
+
+// ── Init ──
+document.getElementById('journal-date').value = currentDate;
+updateHeader(currentDate);
+renderTrades();
+renderKnowledge();
+
+document.getElementById('journal-date').addEventListener('change', function() {
+  currentDate = this.value;
+  updateHeader(currentDate);
+  loadJournal(currentDate);
+});
+
+function updateHeader(str) {
+  const d = new Date(str + 'T00:00:00');
+  const days = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+  document.getElementById('header-date').textContent = `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
+  document.getElementById('header-weekday').textContent = days[d.getDay()];
+}
+
+// ── Tabs ──
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  const tabs = ['morning','evening','calendar','knowledge'];
+  document.querySelectorAll('.tab-btn')[tabs.indexOf(name)].classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+}
+
+// ── Views ──
+function showView(v) {
+  document.getElementById('view-journal').style.display = v === 'journal' ? '' : 'none';
+  document.getElementById('view-history').style.display = v === 'history' ? '' : 'none';
+  document.getElementById('view-monthly-cal').style.display = v === 'monthly' ? '' : 'none';
+  document.getElementById('view-knowledgeArchive').style.display = v === 'knowledgeArchive' ? '' : 'none';
+  document.getElementById('view-checklist').style.display = v === 'checklist' ? '' : 'none';
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const order = ['journal','history','monthly','knowledgeArchive','checklist'];
+  document.querySelectorAll('.nav-btn')[order.indexOf(v)].classList.add('active');
+  if (v === 'history') renderHistory();
+  if (v === 'monthly') { mcalInit(); renderMcal(); }
+  if (v === 'knowledgeArchive') renderKnowledgeArchive();
+  if (v === 'checklist') { clRenderSavedList(); clRender(); }
+}
+
+// ── 경제 지식 모음(아카이브) ──
+async function renderKnowledgeArchive() {
+  const listEl = document.getElementById('ka-list');
+  const countEl = document.getElementById('ka-count');
+  if (!listEl) return;
+  listEl.innerHTML = '<div class="empty-state">불러오는 중...</div>';
+
+  await loadAllJournals();
+  const search = (document.getElementById('ka-search')?.value || '').trim().toLowerCase();
+  const catFilter = document.getElementById('ka-cat-filter')?.value || '';
+
+  // 모든 날짜의 knowledge 배열을 date와 함께 평탄화
+  let items = [];
+  Object.keys(journalCache).forEach(date => {
+    const k = journalCache[date]?.knowledge || [];
+    k.forEach(item => {
+      if (!item || (!item.title && !item.body)) return;
+      items.push({ ...item, date });
+    });
+  });
+
+  if (search) {
+    items = items.filter(i =>
+      (i.title || '').toLowerCase().includes(search) ||
+      stripHtml(i.body).toLowerCase().includes(search)
+    );
+  }
+  if (catFilter) items = items.filter(i => i.cat === catFilter);
+
+  items.sort((a,b) => b.date.localeCompare(a.date));
+  countEl.textContent = `총 ${items.length}개`;
+
+  if (items.length === 0) {
+    listEl.innerHTML = '<div class="empty-state">아직 기록된 경제 지식이 없어요.<br>저녁 기록의 "💡 경제 지식" 탭에서 작성해보세요 💡</div>';
+    return;
+  }
+
+  listEl.innerHTML = items.map(item => {
+    const imgs = (item.images || []).map(url => `<img src="${url}" alt="첨부 이미지" style="width:90px;height:90px;object-fit:cover;border-radius:6px;cursor:pointer;border:1px solid var(--border);" onclick="openLightbox('${url}')">`).join('');
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+        <span style="font-size:14px;font-weight:600;">${item.title || '(제목 없음)'}</span>
+        ${item.cat ? `<span style="font-size:10px;background:var(--surface2);color:var(--text2);padding:2px 7px;border-radius:5px;font-weight:600;">${item.cat}</span>` : ''}
+        <span style="font-size:11px;color:var(--text3);margin-left:auto;">${formatDateKo(item.date)}</span>
+      </div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.65;white-space:pre-wrap;">${item.body || ''}</div>
+      ${imgs ? `<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">${imgs}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── Spread calc ──
+function calcSpread() {
+  const t10 = parseFloat(document.querySelector('[data-key="t10y"]').value.replace('%',''));
+  const t2 = parseFloat(document.querySelector('[data-key="t2y"]').value.replace('%',''));
+  const el = document.getElementById('spread-display');
+  if (!isNaN(t10) && !isNaN(t2)) {
+    const diff = (t10 - t2).toFixed(2);
+    el.textContent = diff + '%p';
+    el.style.color = parseFloat(diff) < 0 ? 'var(--red)' : 'var(--green)';
+  }
+}
+document.querySelector('[data-key="t10y"]').addEventListener('input', calcSpread);
+document.querySelector('[data-key="t2y"]').addEventListener('input', calcSpread);
+
+// ── Emotion chips ──
+function toggleChip(el) { el.classList.toggle('on'); }
+
+// ── Trades ──
+function renderTrades() {
+  const list = document.getElementById('trade-list');
+  list.innerHTML = '';
+  if (trades.length === 0) addTrade(); else trades.forEach((t,i) => renderTradeBlock(i, t));
+}
+
+function renderTradeBlock(i, data) {
+  const d = data || { type:'매수', ticker:'', qty:'', price:'', reason:'' };
+  const div = document.createElement('div');
+  div.className = 'trade-block';
+  div.dataset.idx = i;
+  div.innerHTML = `
+    <div class="trade-header">
+      <select class="trade-type-sel">
+        <option ${d.type==='매수'?'selected':''}>매수</option>
+        <option ${d.type==='매도'?'selected':''}>매도</option>
+        <option ${d.type==='관망'?'selected':''}>관망</option>
+      </select>
+      <input class="trade-inp ticker" type="text" placeholder="종목 (예: NVDA)" value="${d.ticker||''}">
+      <input class="trade-inp qty" type="text" placeholder="수량" value="${d.qty||''}">
+      <input class="trade-inp price" type="text" placeholder="단가" value="${d.price||''}">
+      <button class="del-btn" onclick="removeTrade(${i})">×</button>
+    </div>
+    <div class="form-row">
+      <label class="form-label">매매 근거 (기술적 / 펀더멘털 / 이벤트)</label>
+      <textarea rows="2" placeholder="예) RSI 38 과매도 + 200일선 지지 확인. 실적발표 전 분할매수 1차.">${d.reason||''}</textarea>
+    </div>`;
+  document.getElementById('trade-list').appendChild(div);
+}
+
+function addTrade() {
+  trades.push({});
+  renderTradeBlock(trades.length - 1, {});
+}
+
+function removeTrade(i) {
+  document.querySelectorAll('#trade-list .trade-block')[i]?.remove();
+}
+
+// ── Knowledge ──
+function renderKnowledge() {
+  const list = document.getElementById('knowledge-list');
+  list.innerHTML = '';
+  if (knowledgeItems.length === 0) addKnowledge();
+  else knowledgeItems.forEach((k,i) => renderKnowledgeCard(i, k));
+}
+
+function renderKnowledgeCard(i, data) {
+  const d = data || { title:'', cat:'매크로', body:'', images:[] };
+  const cats = ['매크로','기술적분석','펀더멘털','심리/행동경제학','파생/ETF','한국경제','기타'];
+  const div = document.createElement('div');
+  div.className = 'knowledge-card';
+  div.dataset.idx = i;
+  div.innerHTML = `
+    <div class="knowledge-header">
+      <input class="k-title" type="text" placeholder="개념명 (예: 장단기금리차 역전)" value="${d.title||''}">
+      <select class="k-cat">${cats.map(c=>`<option ${c===d.cat?'selected':''}>${c}</option>`).join('')}</select>
+      <button onclick="removeKnowledge(${i})" style="border:none;background:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0 4px;line-height:1;">×</button>
+    </div>
+    <div class="rte-wrap">
+      <div class="rte-toolbar">
+        <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('bold')"><b>B</b></button>
+        <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('underline')"><u>U</u></button>
+        <span class="rte-sep"></span>
+        <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'3')">보통</button>
+        <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'5')">크게</button>
+        <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('fontSize',false,'6')">아주크게</button>
+        <span class="rte-sep"></span>
+        <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('removeFormat')">서식지우기</button>
+      </div>
+      <div class="k-body rte-editor" contenteditable="true" data-placeholder="내용 & 내 포트폴리오에 주는 시사점 (예: 장단기금리차 역전 → 평균 14개월 후 경기침체. 현재 -0.3%p. QLD 비중 점검 시그널로 활용.)" onpaste="kImgPasteHandler(event,${i})" oninput="rteCleanup(this)">${d.body||''}</div>
+    </div>
+    <div class="k-img-grid" id="k-img-grid-${i}"></div>
+    <div class="k-img-zone" id="k-img-zone-${i}" onclick="document.getElementById('k-img-input-${i}').click()" ondragover="kImgDragOver(event,${i})" ondragleave="kImgDragLeave(event,${i})" ondrop="kImgDrop(event,${i})">
+      <span style="font-size:16px;">📎</span>
+      <div class="k-img-zone-label"><span>이미지 첨부</span> — 클릭 · 드래그앤드롭 · 본문에 Ctrl+V 붙여넣기 (차트·스크린샷·자료)</div>
+      <div class="k-img-uploading" id="k-img-uploading-${i}" style="display:none;">⏳ 업로드 중...</div>
+    </div>
+    <input type="file" class="k-img-input" id="k-img-input-${i}" accept="image/*" multiple onchange="kImgUpload(this,${i})">`;
+  document.getElementById('knowledge-list').appendChild(div);
+  // 기존 이미지 렌더
+  if (d.images && d.images.length) {
+    d.images.forEach((url, imgIdx) => renderKImgItem(i, url, imgIdx));
+  }
+}
+
+// ── Knowledge Image Upload ──
+const STORAGE_BUCKET = 'journal-images';
+
+function kImgDragOver(e, idx) {
+  e.preventDefault();
+  document.getElementById('k-img-zone-' + idx).classList.add('dragover');
+}
+function kImgDragLeave(e, idx) {
+  document.getElementById('k-img-zone-' + idx).classList.remove('dragover');
+}
+function kImgDrop(e, idx) {
+  e.preventDefault();
+  document.getElementById('k-img-zone-' + idx).classList.remove('dragover');
+  const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+  if (files.length) uploadKImages(files, idx);
+}
+function kImgUpload(input, idx) {
+  const files = Array.from(input.files);
+  if (files.length) uploadKImages(files, idx);
+  input.value = '';
+}
+
+// ── 클립보드 붙여넣기(Ctrl+V)로 이미지 첨부 ──
+// 지식 카드의 제목/본문 입력란에 포커스한 상태에서 이미지를 복사해 Ctrl+V 하면 자동 업로드됨
+function kImgPasteHandler(e, idx) {
+  const items = (e.clipboardData || window.clipboardData)?.items;
+  if (!items) return;
+  const files = [];
+  for (const item of items) {
+    if (item.type && item.type.startsWith('image/')) {
+      const file = item.getAsFile();
+      if (file) files.push(file);
+    }
+  }
+  if (files.length) {
+    e.preventDefault();
+    uploadKImages(files, idx);
+  }
+}
+
+async function uploadKImages(files, cardIdx) {
+  const uploadingEl = document.getElementById('k-img-uploading-' + cardIdx);
+  if (uploadingEl) uploadingEl.style.display = '';
+  for (const file of files) {
+    try {
+      const ext = file.name.split('.').pop() || 'jpg';
+      const path = `knowledge/${Date.now()}_${Math.random().toString(36).slice(2,7)}.${ext}`;
+      const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${STORAGE_BUCKET}/${path}`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': file.type,
+          'x-upsert': 'true'
+        },
+        body: file
+      });
+      if (!res.ok) { const err = await res.text(); throw new Error(err); }
+      const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${path}`;
+      const grid = document.getElementById('k-img-grid-' + cardIdx);
+      const imgIdx = grid.children.length;
+      renderKImgItem(cardIdx, publicUrl, imgIdx);
+    } catch(err) {
+      showToast('❌ 이미지 업로드 실패 — Supabase Storage 버킷 확인 필요');
+      console.error(err);
+    }
+  }
+  if (uploadingEl) uploadingEl.style.display = 'none';
+}
+
+function renderKImgItem(cardIdx, url, imgIdx) {
+  const grid = document.getElementById('k-img-grid-' + cardIdx);
+  if (!grid) return;
+  const item = document.createElement('div');
+  item.className = 'k-img-item';
+  item.dataset.url = url;
+  item.innerHTML = `
+    <img src="${url}" alt="첨부 이미지" onclick="openLightbox('${url}')">
+    <button class="k-img-del" onclick="removeKImg(${cardIdx}, this)" title="삭제">✕</button>`;
+  grid.appendChild(item);
+}
+
+function removeKImg(cardIdx, btn) {
+  btn.closest('.k-img-item').remove();
+}
+
+// 이미지 수집 (저장 시 포함)
+function collectKnowledgeImages(cardEl) {
+  return Array.from(cardEl.querySelectorAll('.k-img-item')).map(item => item.dataset.url);
+}
+
+// ── Lightbox ──
+function openLightbox(url) {
+  let lb = document.getElementById('img-lightbox');
+  if (!lb) {
+    lb = document.createElement('div');
+    lb.className = 'img-lightbox';
+    lb.id = 'img-lightbox';
+    lb.innerHTML = `<button class="img-lightbox-close" onclick="closeLightbox()">✕</button><img id="img-lightbox-img" src="">`;
+    lb.addEventListener('click', e => { if (e.target === lb) closeLightbox(); });
+    document.body.appendChild(lb);
+  }
+  document.getElementById('img-lightbox-img').src = url;
+  lb.classList.add('open');
+}
+function closeLightbox() {
+  const lb = document.getElementById('img-lightbox');
+  if (lb) lb.classList.remove('open');
+}
+
+function addKnowledge() {
+  knowledgeItems.push({});
+  renderKnowledgeCard(knowledgeItems.length - 1, {});
+}
+
+function removeKnowledge(i) {
+  document.querySelectorAll('#knowledge-list .knowledge-card')[i]?.remove();
+}
+
+// ══════════════════════════════════════
+// ── Supabase 설정 ──
+// ══════════════════════════════════════
+const SUPABASE_URL = 'https://hkxuiorozzampekwojxb.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhreHVpb3JvenphbXBla3dvanhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNzI4NzEsImV4cCI6MjA5Njk0ODg3MX0.ARFMSWHtp-V-DZOj7y87UweDsjhDkOC6q1kPqZRlO-M';
+
+async function sbFetch(path, options = {}) {
+  const { prefer, headers: extraHeaders, body, method } = options;
+  let res;
+  try {
+    res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+      method: method || 'GET',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        ...(prefer ? { 'Prefer': prefer } : {}),
+        ...(extraHeaders || {})
+      },
+      ...(body ? { body } : {})
+    });
+  } catch (networkErr) {
+    // fetch 자체가 실패 = 네트워크 차단, 프로젝트 일시정지, 잘못된 URL 등
+    throw new Error('NETWORK: ' + networkErr.message);
+  }
+  if (!res.ok && res.status !== 204) {
+    const err = await res.text();
+    throw new Error('HTTP ' + res.status + ': ' + err);
+  }
+  if (res.status === 204 || res.status === 201) return null;
+  const text = await res.text();
+  if (!text || text.trim() === "") return null;
+  return JSON.parse(text);
+}
+
+// in-memory cache: { date: dataObject }
+let journalCache = {};
+
+async function loadAllJournals() {
+  try {
+    const rows = await sbFetch('Journal?select=date,data&order=date.desc');
+    journalCache = {};
+    (rows || []).forEach(r => {
+      try { journalCache[r.date] = JSON.parse(r.data); } catch(e) {}
+    });
+  } catch(e) {
+    console.error('불러오기 실패:', e);
+  }
+}
+
+// ── 서식 있는 글쓰기(rich text) 유틸 ──
+// contenteditable에서 전부 지우면 <br>만 남는 경우가 있어 placeholder가 안 뜸 → 정리
+function rteCleanup(el) {
+  const html = el.innerHTML.trim();
+  if (html === '<br>' || html === '<div><br></div>') el.innerHTML = '';
+}
+// 미리보기/검색용: HTML 태그 제거 후 순수 텍스트만 추출
+function stripHtml(html) {
+  if (!html) return '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+}
+
+// ── Collect & Save ──
+function collectData() {
+  const data = {};
+  document.querySelectorAll('[data-key]').forEach(el => {
+    if (el.type === 'checkbox') data[el.dataset.key] = el.checked;
+    else if (el.classList.contains('rte-editor')) data[el.dataset.key] = el.innerHTML;
+    else data[el.dataset.key] = el.value;
+  });
+  data.emotions = Array.from(document.querySelectorAll('.emotion-chip.on')).map(e => e.dataset.val);
+  data.trades = Array.from(document.querySelectorAll('#trade-list .trade-block')).map(block => ({
+    type: block.querySelector('select').value,
+    ticker: block.querySelector('.ticker').value,
+    qty: block.querySelector('.qty').value,
+    price: block.querySelector('.price').value,
+    reason: block.querySelector('textarea').value,
+  }));
+  data.knowledge = Array.from(document.querySelectorAll('#knowledge-list .knowledge-card')).map(card => ({
+    title: card.querySelector('.k-title').value,
+    cat: card.querySelector('.k-cat').value,
+    body: card.querySelector('.k-body').innerHTML,
+    images: collectKnowledgeImages(card),
+  }));
+  data.pnl = document.getElementById('pnl-input').value;
+  data.savedAt = new Date().toISOString();
+  return data;
+}
+
+async function saveJournal() {
+  const data = collectData();
+  const btn = document.querySelector('.save-btn');
+  if (btn) { btn.textContent = '저장 중...'; btn.disabled = true; }
+
+  try {
+    const payload = JSON.stringify(data);
+    // 먼저 존재하는지 확인
+    const existing = await sbFetch('Journal?select=id&date=eq.' + currentDate + '&limit=1');
+    if (existing && existing.length > 0) {
+      // 업데이트
+      await sbFetch('Journal?date=eq.' + currentDate, {
+        method: 'PATCH',
+        body: JSON.stringify({ data: payload })
+      });
+    } else {
+      // 신규 삽입
+      await sbFetch('Journal', {
+        method: 'POST',
+        body: JSON.stringify({ date: currentDate, data: payload })
+      });
+    }
+    journalCache[currentDate] = data;
+    showToast('☁️ ' + formatDateKo(currentDate).slice(0,-4) + ' 저장 완료');
+    renderRecentList();
+  } catch(e) {
+    console.error(e);
+    let msg = '❌ 저장 실패: ' + e.message;
+    if (e.message.includes('NETWORK')) msg = '❌ 저장 실패 — Supabase 서버에 연결할 수 없음 (프로젝트 일시정지 여부 확인 필요)';
+    else if (e.message.includes('401') || e.message.includes('403')) msg = '❌ 저장 실패 — 인증/권한 오류 (API 키 또는 RLS 정책 확인 필요)';
+    else if (e.message.includes('404')) msg = '❌ 저장 실패 — Journal 테이블을 찾을 수 없음';
+    showToast(msg);
+    alert('저장 실패 상세 원인:\n\n' + e.message + '\n\nSupabase 대시보드에서 아래를 확인해주세요:\n1) 프로젝트가 일시정지(Paused) 상태인지\n2) Journal 테이블의 RLS(Row Level Security) 정책에서 anon 역할의 INSERT/UPDATE가 허용되어 있는지');
+  } finally {
+    if (btn) { btn.textContent = '💾 저장'; btn.disabled = false; }
+  }
+}
+
+// ── Load ──
+function applyDataToUI(data) {
+  document.querySelectorAll('[data-key]').forEach(el => {
+    if (el.type === 'checkbox') el.checked = false;
+    else if (el.tagName === 'SELECT') el.selectedIndex = 0;
+    else if (el.classList.contains('rte-editor')) el.innerHTML = '';
+    else el.value = '';
+  });
+  document.querySelectorAll('.emotion-chip').forEach(e => e.classList.remove('on'));
+
+  if (data && Object.keys(data).length) {
+    Object.keys(data).forEach(k => {
+      const el = document.querySelector(`[data-key="${k}"]`);
+      if (!el) return;
+      if (el.type === 'checkbox') el.checked = data[k];
+      else if (el.tagName === 'SELECT') el.value = data[k];
+      else if (el.classList.contains('rte-editor')) el.innerHTML = data[k] || '';
+      else el.value = data[k];
+    });
+    (data.emotions || []).forEach(val => {
+      const chip = document.querySelector(`.emotion-chip[data-val="${val}"]`);
+      if (chip) chip.classList.add('on');
+    });
+    trades = data.trades || [];
+    knowledgeItems = data.knowledge || [];
+    document.getElementById('pnl-input').value = data.pnl || '';
+  } else {
+    trades = [];
+    knowledgeItems = [];
+  }
+  renderTrades();
+  renderKnowledge();
+  calcSpread();
+}
+
+async function loadJournal(date) {
+  // 캐시에 있으면 바로 사용
+  if (journalCache[date] !== undefined) {
+    applyDataToUI(journalCache[date]);
+    return;
+  }
+  // 없으면 Supabase에서 개별 조회
+  try {
+    const rows = await sbFetch(`Journal?select=data&date=eq.${date}&limit=1`);
+    const data = (rows && rows[0]) ? JSON.parse(rows[0].data) : {};
+    journalCache[date] = data;
+    applyDataToUI(data);
+  } catch(e) {
+    applyDataToUI({});
+    console.error(e);
+  }
+}
+
+// ── History ──
+async function renderHistory() {
+  const grid = document.getElementById('history-grid');
+  const count = document.getElementById('history-count');
+  grid.innerHTML = '<div class="empty-state">불러오는 중...</div>';
+
+  await loadAllJournals();
+  const dates = Object.keys(journalCache).sort().reverse();
+  count.textContent = `총 ${dates.length}개 기록`;
+
+  if (dates.length === 0) {
+    grid.innerHTML = '<div class="empty-state">아직 저장된 기록이 없어요.<br>일지를 작성하고 저장해보세요 📝</div>';
+    return;
+  }
+
+  grid.innerHTML = '';
+  dates.forEach(date => {
+    const d = journalCache[date];
+    const pnl = d.pnl || '';
+    const preview = stripHtml(d.market_flow) || stripHtml(d.news) || stripHtml(d.strategy) || '기록 있음';
+    const isPos = pnl.startsWith('+');
+    const isNeg = pnl.startsWith('-');
+
+    const card = document.createElement('div');
+    card.className = 'history-card';
+    card.innerHTML = `
+      <div class="h-date">${formatDateKo(date)}</div>
+      <div class="h-preview">${preview.slice(0,60)}${preview.length > 60 ? '…' : ''}</div>
+      <div class="h-pnl ${isPos?'pos':isNeg?'neg':''}">${pnl || '—'}</div>
+      <button class="h-del" onclick="deleteRecord('${date}', event)">삭제</button>`;
+    card.addEventListener('click', () => {
+      currentDate = date;
+      document.getElementById('journal-date').value = date;
+      updateHeader(date);
+      loadJournal(date);
+      showView('journal');
+    });
+    grid.appendChild(card);
+  });
+}
+
+async function deleteRecord(date, e) {
+  e.stopPropagation();
+  if (confirm(`${formatDateKo(date)} 기록을 삭제할까요?`)) {
+    try {
+      await sbFetch(`Journal?date=eq.${date}`, { method: 'DELETE' });
+      delete journalCache[date];
+      renderHistory();
+      renderRecentList();
+      showToast('삭제됨');
+    } catch(err) {
+      showToast('❌ 삭제 실패');
+    }
+  }
+}
+
+// ── Recent list ──
+function renderRecentList() {
+  const dates = Object.keys(journalCache).sort().reverse().slice(0, 5);
+  const el = document.getElementById('recent-list');
+  el.innerHTML = dates.length ? '' : '<div style="font-size:12px;color:var(--text3);padding:6px 0;">아직 기록 없음</div>';
+  dates.forEach(date => {
+    const d = journalCache[date];
+    const div = document.createElement('div');
+    div.className = 'record-dot';
+    const dd = new Date(date + 'T00:00:00');
+    const label = `${dd.getMonth()+1}/${dd.getDate()} ${d.pnl ? '(' + d.pnl + ')' : ''}`;
+    div.innerHTML = `<span class="dot"></span><span>${label}</span>`;
+    div.onclick = () => {
+      currentDate = date;
+      document.getElementById('journal-date').value = date;
+      updateHeader(date);
+      loadJournal(date);
+      showView('journal');
+    };
+    el.appendChild(div);
+  });
+}
+
+// ── Toast ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── Init: 앱 시작 시 전체 데이터 불러오기 ──
+loadAllJournals().then(() => {
+  renderRecentList();
+  loadJournal(currentDate);
+});
+
+// 페이지 열면 자동으로 시장 지표 로드
+fetchAutoIndicators();
+
+// ── Auto-save on unload ──
+window.addEventListener('beforeunload', () => {
+  const data = collectData();
+  const hasContent = data.pnl || stripHtml(data.market_flow) || stripHtml(data.news) || stripHtml(data.strategy) ||
+    (data.trades && data.trades.some(t => t.ticker));
+  if (hasContent) saveJournal();
+});
+
+// ══════════════════════════════════════
+// ── Monthly Calendar ──
+// ══════════════════════════════════════
+
+let mcalYear, mcalMonth, mcalSelectedDate = null;
+let mcalEvents = {}; // { 'YYYY-MM-DD': [ {title, type, time, memo}, ... ] }
+
+function mcalInit() {
+  if (mcalYear !== undefined) return; // already initialized
+  const today = new Date();
+  mcalYear = today.getFullYear();
+  mcalMonth = today.getMonth(); // 0-based
+  loadMcalFromStorage();
+}
+
+function mcalStorageKey() {
+  return `mcal_${mcalYear}_${String(mcalMonth + 1).padStart(2, '0')}`;
+}
+
+function loadMcalFromStorage() {
+  // Load all mcal_ keys so events persist across months
+  mcalEvents = {};
+  Object.keys(localStorage).forEach(k => {
+    if (k.startsWith('mcal_')) {
+      try {
+        const data = JSON.parse(localStorage.getItem(k));
+        Object.assign(mcalEvents, data);
+      } catch(e) {}
+    }
+  });
+}
+
+function saveMcal() {
+  // Group events by year-month and store per month
+  const byMonth = {};
+  Object.keys(mcalEvents).forEach(dateStr => {
+    const ym = dateStr.slice(0, 7).replace('-', '_');
+    const key = `mcal_${ym.replace('-', '_')}`;
+    if (!byMonth[key]) byMonth[key] = {};
+    byMonth[key][dateStr] = mcalEvents[dateStr];
+  });
+
+  // Save current month (even if empty, to persist deletions)
+  const curKey = mcalStorageKey();
+  if (!byMonth[curKey]) byMonth[curKey] = {};
+
+  Object.keys(byMonth).forEach(k => {
+    localStorage.setItem(k, JSON.stringify(byMonth[k]));
+  });
+  showToast('📅 캘린더 저장 완료');
+}
+
+function mcalMove(delta) {
+  mcalMonth += delta;
+  if (mcalMonth > 11) { mcalMonth = 0; mcalYear++; }
+  if (mcalMonth < 0) { mcalMonth = 11; mcalYear--; }
+  renderMcal();
+}
+
+function mcalGoToday() {
+  const today = new Date();
+  mcalYear = today.getFullYear();
+  mcalMonth = today.getMonth();
+  renderMcal();
+}
+
+function renderMcal() {
+  const monthNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  document.getElementById('mcal-month-title').textContent = `${mcalYear}년 ${monthNames[mcalMonth]}`;
+
+  const grid = document.getElementById('mcal-days-grid');
+  grid.innerHTML = '';
+
+  const today = new Date();
+  const todayStr2 = today.toISOString().split('T')[0];
+
+  // First day of month
+  const firstDay = new Date(mcalYear, mcalMonth, 1);
+  const startDow = firstDay.getDay(); // 0=Sun
+  const daysInMonth = new Date(mcalYear, mcalMonth + 1, 0).getDate();
+  const daysInPrev = new Date(mcalYear, mcalMonth, 0).getDate();
+
+  const totalCells = Math.ceil((startDow + daysInMonth) / 7) * 7;
+
+  for (let i = 0; i < totalCells; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'mcal-day';
+
+    let cellDate, isOtherMonth = false;
+    if (i < startDow) {
+      const d = daysInPrev - startDow + 1 + i;
+      cellDate = new Date(mcalYear, mcalMonth - 1, d);
+      isOtherMonth = true;
+    } else if (i >= startDow + daysInMonth) {
+      const d = i - startDow - daysInMonth + 1;
+      cellDate = new Date(mcalYear, mcalMonth + 1, d);
+      isOtherMonth = true;
+    } else {
+      cellDate = new Date(mcalYear, mcalMonth, i - startDow + 1);
+    }
+
+    const dateStr = cellDate.toISOString().split('T')[0];
+    const dow = cellDate.getDay();
+
+    if (isOtherMonth) cell.classList.add('other-month');
+    if (dateStr === todayStr2) cell.classList.add('today');
+    if (dow === 0) cell.classList.add('sun-col');
+    if (dow === 6) cell.classList.add('sat-col');
+
+    // Day number
+    const numEl = document.createElement('div');
+    numEl.className = 'mcal-day-num';
+    numEl.textContent = cellDate.getDate();
+    cell.appendChild(numEl);
+
+    // Events
+    const evs = mcalEvents[dateStr] || [];
+    const MAX_VISIBLE = 3;
+    evs.slice(0, MAX_VISIBLE).forEach((ev, evIdx) => {
+      const evEl = document.createElement('div');
+      evEl.className = `mcal-event type-${ev.type}`;
+      evEl.title = ev.title + (ev.time ? ' · ' + ev.time : '') + (ev.memo ? '\n' + ev.memo : '');
+      evEl.innerHTML = `<span style="flex:1;overflow:hidden;text-overflow:ellipsis;">${ev.title}</span><span class="mcal-event-del" onclick="deleteMcalEvent('${dateStr}',${evIdx},event)">✕</span>`;
+      evEl.addEventListener('click', (e) => {
+        if (e.target.classList.contains('mcal-event-del')) return;
+        showDetail(dateStr);
+      });
+      cell.appendChild(evEl);
+    });
+    if (evs.length > MAX_VISIBLE) {
+      const more = document.createElement('div');
+      more.className = 'mcal-more';
+      more.textContent = `+${evs.length - MAX_VISIBLE}개 더`;
+      more.onclick = (e) => { e.stopPropagation(); showDetail(dateStr); };
+      cell.appendChild(more);
+    }
+
+    // Click to add
+    cell.addEventListener('click', (e) => {
+      if (e.target.closest('.mcal-event') || e.target.closest('.mcal-more')) return;
+      openMcalModal(dateStr);
+    });
+
+    grid.appendChild(cell);
+  }
+
+  // Refresh detail if open
+  if (mcalSelectedDate) showDetail(mcalSelectedDate);
+}
+
+function showDetail(dateStr) {
+  mcalSelectedDate = dateStr;
+  const d = new Date(dateStr + 'T00:00:00');
+  const days = ['일','월','화','수','목','금','토'];
+  document.getElementById('mcal-detail-date-label').textContent =
+    `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]}) 일정`;
+
+  const list = document.getElementById('mcal-detail-list');
+  const evs = mcalEvents[dateStr] || [];
+  if (evs.length === 0) {
+    list.innerHTML = '<div style="font-size:13px;color:var(--text3);padding:8px 0;">이 날에 등록된 일정이 없어요. 캘린더에서 날짜를 클릭해 추가하세요.</div>';
+  } else {
+    const typeColors = { macro:'var(--blue)', earnings:'var(--amber)', portfolio:'var(--green)', personal:'var(--purple)', risk:'var(--red)' };
+    list.innerHTML = evs.map((ev, i) => `
+      <div class="mcal-detail-event">
+        <div class="mcal-detail-dot" style="background:${typeColors[ev.type]||'var(--text3)'}"></div>
+        <div class="mcal-detail-content">
+          <div class="de-title">${ev.title}</div>
+          ${ev.time ? `<div class="de-time">🕐 ${ev.time}</div>` : ''}
+          ${ev.memo ? `<div class="de-memo">${ev.memo}</div>` : ''}
+        </div>
+        <button class="mcal-detail-del-btn" onclick="deleteMcalEvent('${dateStr}',${i},event)">삭제</button>
+      </div>`).join('');
+  }
+  document.getElementById('mcal-detail').style.display = '';
+}
+
+function closeDetail() {
+  mcalSelectedDate = null;
+  document.getElementById('mcal-detail').style.display = 'none';
+}
+
+// ── Modal ──
+let mcalModalDate = null;
+
+function openMcalModal(dateStr) {
+  mcalModalDate = dateStr;
+  const d = new Date(dateStr + 'T00:00:00');
+  const days = ['일','월','화','수','목','금','토'];
+  document.getElementById('mcal-modal-date-label').textContent =
+    `${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]}) 일정 추가`;
+  document.getElementById('mcal-ev-title').value = '';
+  document.getElementById('mcal-ev-type').value = 'macro';
+  document.getElementById('mcal-ev-time').value = '';
+  document.getElementById('mcal-ev-memo').value = '';
+  document.getElementById('mcal-modal').classList.add('open');
+  setTimeout(() => document.getElementById('mcal-ev-title').focus(), 50);
+}
+
+function closeMcalModal() {
+  document.getElementById('mcal-modal').classList.remove('open');
+  mcalModalDate = null;
+}
+
+function addMcalEvent() {
+  const title = document.getElementById('mcal-ev-title').value.trim();
+  if (!title) { document.getElementById('mcal-ev-title').focus(); return; }
+  const ev = {
+    title,
+    type: document.getElementById('mcal-ev-type').value,
+    time: document.getElementById('mcal-ev-time').value.trim(),
+    memo: document.getElementById('mcal-ev-memo').value.trim(),
+  };
+  if (!mcalEvents[mcalModalDate]) mcalEvents[mcalModalDate] = [];
+  mcalEvents[mcalModalDate].push(ev);
+  closeMcalModal();
+  renderMcal();
+  showDetail(mcalModalDate);
+  saveMcal();
+}
+
+function deleteMcalEvent(dateStr, idx, e) {
+  e.stopPropagation();
+  mcalEvents[dateStr].splice(idx, 1);
+  if (mcalEvents[dateStr].length === 0) delete mcalEvents[dateStr];
+  renderMcal();
+  if (mcalSelectedDate === dateStr) showDetail(dateStr);
+  saveMcal();
+}
+
+// Close modal on bg click
+document.getElementById('mcal-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeMcalModal();
+});
+
+// Enter key in title to submit
+document.getElementById('mcal-ev-title').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') addMcalEvent();
+});
+// ══════════════════════════════════════
+// ── 종목분석 체크리스트 ──
+// ══════════════════════════════════════
+
+const CL_DATA = {
+  beginner: [
+    { section: "1단계 — 이 회사가 뭐하는 곳인지 이해", items: [
+      { id:"b1", market:"all", title:"주요 사업이 뭔지 한 문장으로 말할 수 있나?", desc:"모르면 사지 마. 설명 못 하면 아직 모르는 거야.", sources:[{label:"국내: 네이버증권 → 기업개요", m:"kr"},{label:"미국: Yahoo Finance → Profile", m:"us"}] },
+      { id:"b2", market:"all", title:"주요 매출원이 어디서 나오나?", desc:"제품/서비스 중 어디서 돈을 가장 많이 버는지 확인.", sources:[{label:"국내: DART → 사업보고서", m:"kr"},{label:"미국: SEC EDGAR → 10-K", m:"us"}] },
+      { id:"b3", market:"all", title:"경쟁사가 누구인지 아나?", desc:"이 회사가 업계에서 몇 위인지, 경쟁우위가 있는지.", sources:[{label:"국내: 네이버증권 → 동종업종", m:"kr"},{label:"미국: Yahoo Finance → Statistics", m:"us"}] },
+    ]},
+    { section: "2단계 — 돈은 잘 버나?", items: [
+      { id:"b4", market:"all", title:"매출이 성장하고 있나? (최근 3년)", desc:"매출이 꾸준히 늘고 있으면 일단 합격.", sources:[{label:"국내: 네이버증권 → 투자지표 → 연간실적", m:"kr"},{label:"미국: Yahoo Finance → Financials", m:"us"}] },
+      { id:"b5", market:"all", title:"영업이익이 흑자인가?", desc:"매출이 커도 이익이 적자면 위험 신호.", sources:[{label:"국내: 네이버증권 → 투자지표", m:"kr"},{label:"미국: Yahoo Finance → Financials", m:"us"}] },
+      { id:"b6", market:"all", title:"부채가 너무 많지 않나? (부채비율)", desc:"제조업 200% 이하, IT 100% 이하 기준.", sources:[{label:"국내: 네이버증권 → 투자지표 → 부채비율", m:"kr"},{label:"미국: Yahoo Finance → Statistics → Balance Sheet", m:"us"}] },
+    ]},
+    { section: "3단계 — 지금 비싼가, 싼가?", items: [
+      { id:"b7", market:"all", title:"PER이 업종 평균 대비 어떤가?", desc:"낮다고 무조건 싼 게 아냐. 업종 평균과 비교가 핵심.", sources:[{label:"국내: 네이버증권 → 동종업종 PER 비교", m:"kr"},{label:"미국: Yahoo Finance → Statistics → Valuation", m:"us"}] },
+      { id:"b8", market:"all", title:"52주 고점·저점 어디쯤인가?", desc:"고점 근처면 리스크, 저점 근처면 기회일 수 있어.", sources:[{label:"국내·미국: TradingView, Yahoo Finance", m:"all"}] },
+    ]},
+    { section: "4단계 — 내가 왜 사려는지", items: [
+      { id:"b9", market:"all", title:"매수 이유를 한 줄로 쓸 수 있나?", desc:"\"남들이 사서\", \"느낌이 좋아서\"는 이유가 아님.", sources:[{label:"→ 투자일지에 직접 기록", m:"all"}] },
+      { id:"b10", market:"all", title:"목표가와 손절가를 정했나?", desc:"진입 전에 반드시 정해야 해. 감정 매매 방지의 핵심.", sources:[{label:"→ 투자일지에 직접 기록", m:"all"}] },
+    ]},
+  ],
+  advanced: [
+    { section: "펀더멘털 분석", items: [
+      { id:"a1", market:"all", title:"매출 성장률 + 영업이익률 트렌드", desc:"YoY 성장률이 가속되는지, 이익률이 개선되는지 방향성 체크.", sources:[{label:"국내: DART 사업보고서", m:"kr"},{label:"미국: SEC 10-K / Yahoo Financials", m:"us"}] },
+      { id:"a2", market:"all", title:"잉여현금흐름(FCF)이 플러스인가?", desc:"FCF = 영업현금흐름 - CAPEX. 영업이익보다 신뢰도 높음.", sources:[{label:"국내: DART → 현금흐름표", m:"kr"},{label:"미국: Yahoo Finance → Cash Flow", m:"us"}] },
+      { id:"a3", market:"all", title:"ROE / ROA 추이 (3년)", desc:"ROE 15% 이상 꾸준하면 자본 효율 좋은 기업.", sources:[{label:"국내: 네이버증권 → 투자지표", m:"kr"},{label:"미국: Yahoo Finance → Statistics", m:"us"}] },
+      { id:"a4", market:"all", title:"부채 구조 — 단기/장기 비율", desc:"단기부채 비중 크면 금리 인상기에 취약. 유동비율 100% 이상 확인.", sources:[{label:"국내: DART → 재무상태표", m:"kr"},{label:"미국: SEC EDGAR → Balance Sheet", m:"us"}] },
+    ]},
+    { section: "밸류에이션", items: [
+      { id:"a5", market:"all", title:"PER / PBR / EV/EBITDA 업종 비교", desc:"멀티플 3개 이상 비교. 하나만 보면 왜곡됨.", sources:[{label:"국내: 네이버증권, FnGuide", m:"kr"},{label:"미국: Yahoo Statistics, Seeking Alpha", m:"us"}] },
+      { id:"a6", market:"all", title:"컨센서스 EPS 기준 Forward PER", desc:"현재 PER보다 내년 예상 실적 기준 Forward PER이 더 중요.", sources:[{label:"국내: 네이버증권 → 컨센서스", m:"kr"},{label:"미국: Yahoo Finance → Analysis, Zacks", m:"us"}] },
+    ]},
+    { section: "업종 / 매크로 연결", items: [
+      { id:"a7", market:"all", title:"현재 금리/달러 환경이 이 업종에 유리한가?", desc:"금리인상 → 성장주 불리 / 달러강세 → 수출주 유리.", sources:[{label:"Investing.com 경제캘린더 + 매크로 판단", m:"all"}] },
+      { id:"a8", market:"all", title:"업종 사이클 어느 단계인가?", desc:"반도체·자동차 등 사이클 산업은 업턴·다운턴 위치가 수익률 좌우.", sources:[{label:"국내: 미래에셋·하나 리서치 리포트", m:"kr"},{label:"미국: Seeking Alpha, Morgan Stanley 리포트", m:"us"}] },
+    ]},
+    { section: "공시 / 내부자 동향", items: [
+      { id:"a9", market:"kr", title:"수시공시 — 유상증자·자사주·계약 확인", desc:"유상증자는 주의, 자사주 매입은 긍정 신호.", sources:[{label:"KIND (kind.krx.co.kr) / DART", m:"kr"}] },
+      { id:"a10", market:"us", title:"내부자 매수/매도 동향", desc:"경영진이 자사주 사면 강력한 신뢰 신호.", sources:[{label:"SEC EDGAR Form 4 / OpenInsider.com", m:"us"}] },
+      { id:"a11", market:"all", title:"애널리스트 목표주가 컨센서스", desc:"목표주가 상향 추세면 긍정적. 단, 과신 금지.", sources:[{label:"국내: 네이버증권 → 목표주가", m:"kr"},{label:"미국: TipRanks, Yahoo → Analysis", m:"us"}] },
+    ]},
+    { section: "매매 전략", items: [
+      { id:"a12", market:"all", title:"기술적 진입 타이밍 — 이평선 / RSI / MACD", desc:"펀더가 좋아도 타이밍 틀리면 단기 손실. 눌림목·지지선 확인.", sources:[{label:"TradingView (국내·미국 모두)", m:"all"}] },
+      { id:"a13", market:"all", title:"포트폴리오 내 비중 적절한가?", desc:"단일 종목 15~20% 초과는 리스크 과다.", sources:[{label:"→ 투자일지 포트폴리오 섹션에 기록", m:"all"}] },
+      { id:"a14", market:"all", title:"매수 근거 + 목표가 + 손절가 기록", desc:"3개 없으면 매수 금지. 감정 개입 차단.", sources:[{label:"→ 투자일지에 직접 기록", m:"all"}] },
+    ]},
+  ]
+};
+
+let clLevel = 'beginner';
+let clMarket = 'all';
+let clChecked = {};
+
+function clSetLevel(level, btn) {
+  clLevel = level;
+  document.querySelectorAll('.cl-level-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  clRender();
+}
+
+function clSetMarket(market, btn) {
+  clMarket = market;
+  document.querySelectorAll('.cl-mkt-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  clRender();
+}
+
+function clUpdateProgress() {
+  const sections = CL_DATA[clLevel];
+  let total = 0, done = 0;
+  sections.forEach(s => s.items.forEach(item => {
+    if (clMarket === 'all' || item.market === 'all' || item.market === clMarket) {
+      total++;
+      const key = clCurrentKey(item.id);
+      if (clChecked[key]) done++;
+    }
+  }));
+  const pct = total === 0 ? 0 : Math.round(done / total * 100);
+  const pt = document.getElementById('cl-progress-text');
+  const pf = document.getElementById('cl-progress-fill');
+  if (pt) pt.textContent = done + ' / ' + total;
+  if (pf) pf.style.width = pct + '%';
+}
+
+function clCurrentKey(itemId) {
+  const ticker = (document.getElementById('cl-ticker')?.value || '').trim().toUpperCase() || '_draft';
+  return ticker + '__' + itemId;
+}
+
+function clToggle(itemId, el) {
+  const key = clCurrentKey(itemId);
+  clChecked[key] = el.checked;
+  clUpdateProgress();
+}
+
+function clReset() {
+  const ticker = (document.getElementById('cl-ticker')?.value || '').trim().toUpperCase() || '_draft';
+  Object.keys(clChecked).forEach(k => { if (k.startsWith(ticker + '__')) delete clChecked[k]; });
+  clRender();
+}
+
+function clSave() {
+  const ticker = (document.getElementById('cl-ticker')?.value || '').trim().toUpperCase();
+  if (!ticker) { alert('종목명을 입력해주세요.'); document.getElementById('cl-ticker').focus(); return; }
+  const sections = CL_DATA[clLevel];
+  let total = 0, done = 0;
+  sections.forEach(s => s.items.forEach(item => {
+    total++;
+    if (clChecked[ticker + '__' + item.id]) done++;
+  }));
+  const saves = JSON.parse(localStorage.getItem('cl_saves') || '{}');
+  saves[ticker] = { ticker, level: clLevel, date: new Date().toISOString().split('T')[0], done, total, checked: {...clChecked} };
+  localStorage.setItem('cl_saves', JSON.stringify(saves));
+  showToast('✅ ' + ticker + ' 체크리스트 저장 완료');
+  clRenderSavedList();
+}
+
+function clRenderSavedList() {
+  const el = document.getElementById('cl-saved-list');
+  if (!el) return;
+  const saves = JSON.parse(localStorage.getItem('cl_saves') || '{}');
+  const keys = Object.keys(saves).sort((a,b) => saves[b].date.localeCompare(saves[a].date));
+  if (keys.length === 0) { el.innerHTML = ''; return; }
+  el.innerHTML = '<div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:8px;">저장된 분석</div>' +
+    keys.map(k => {
+      const s = saves[k];
+      const pct = Math.round(s.done / s.total * 100);
+      return `<div class="cl-saved-item" onclick="clLoad('${k}')">
+        <span class="cl-saved-ticker">${s.ticker}</span>
+        <span class="cl-saved-meta">${s.date} · ${s.level === 'beginner' ? '초보용' : '중급용'}</span>
+        <span class="cl-saved-pct">${s.done}/${s.total} (${pct}%)</span>
+        <button class="cl-saved-del" onclick="clDeleteSave('${k}',event)">삭제</button>
+      </div>`;
+    }).join('');
+}
+
+function clLoad(ticker) {
+  const saves = JSON.parse(localStorage.getItem('cl_saves') || '{}');
+  const s = saves[ticker];
+  if (!s) return;
+  document.getElementById('cl-ticker').value = s.ticker;
+  clLevel = s.level;
+  Object.assign(clChecked, s.checked || {});
+  document.querySelectorAll('.cl-level-btn').forEach((b,i) => b.classList.toggle('active', (i===0 && clLevel==='beginner')||(i===1 && clLevel==='advanced')));
+  clRender();
+  showToast(ticker + ' 불러오기 완료');
+}
+
+function clDeleteSave(ticker, e) {
+  e.stopPropagation();
+  if (!confirm(ticker + ' 저장 기록을 삭제할까요?')) return;
+  const saves = JSON.parse(localStorage.getItem('cl_saves') || '{}');
+  delete saves[ticker];
+  localStorage.setItem('cl_saves', JSON.stringify(saves));
+  clRenderSavedList();
+  showToast('삭제됨');
+}
+
+function clRender() {
+  const container = document.getElementById('cl-container');
+  if (!container) return;
+  const sections = CL_DATA[clLevel];
+  let html = '';
+  sections.forEach(s => {
+    const filtered = s.items.filter(item => clMarket === 'all' || item.market === 'all' || item.market === clMarket);
+    if (filtered.length === 0) return;
+    html += '<div class="cl-section"><div class="cl-section-title">' + s.section + '</div>';
+    filtered.forEach(item => {
+      const key = clCurrentKey(item.id);
+      const isChecked = !!clChecked[key];
+      const badges = item.sources.map(src => {
+        const cls = src.m === 'kr' ? 'cl-badge-kr' : src.m === 'us' ? 'cl-badge-us' : 'cl-badge-all';
+        return '<span class="cl-badge ' + cls + '">' + src.label + '</span>';
+      }).join('');
+      html += `<div class="cl-item">
+        <input type="checkbox" class="cl-checkbox" ${isChecked ? 'checked' : ''} onchange="clToggle('${item.id}',this)">
+        <div>
+          <div class="cl-title">${item.title}</div>
+          <div class="cl-desc">${item.desc}</div>
+          <div class="cl-sources">${badges}</div>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  container.innerHTML = html;
+  clUpdateProgress();
+}
+
+// 종목 입력창 변경 시 체크 상태 갱신
+document.addEventListener('DOMContentLoaded', () => {
+  const tickerInput = document.getElementById('cl-ticker');
+  if (tickerInput) tickerInput.addEventListener('input', () => clRender());
+});
+
+</script>
+
+</body></html>
